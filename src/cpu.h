@@ -1,5 +1,6 @@
 #ifndef CPU_H
 #define CPU_H
+#include "registers.h"
 
 /*
 Details:
@@ -44,6 +45,57 @@ struct instruction {
 Split gameboy struct into CPU, memory etc structs, then pass into functions
 as need be.
 */
+
+struct cpu {
+	//union reg AF;
+	//union reg BC;
+	//union reg DE;
+	//union reg HL;
+
+	struct {
+		union {
+			uint16_t af;
+			struct {
+				uint8_t f;
+				uint8_t a;
+			};
+		};
+	};
+
+	struct {
+		union {
+			uint16_t bc;
+			struct {
+				uint8_t c;
+				uint8_t b;
+			};
+		};
+	};
+
+	struct {
+		union {
+			uint16_t de;
+			struct {
+				uint8_t e;
+				uint8_t d;
+			};
+		};
+	};
+
+	struct {
+		union {
+			uint16_t hl;
+			struct {
+				uint8_t l;
+				uint8_t h;
+			};
+		};
+	};
+	
+	uint16_t sp;
+	uint16_t pc;
+
+};
 
 // 0x00 - 0x0F
 void nop(void); //0

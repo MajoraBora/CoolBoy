@@ -294,17 +294,6 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 
 };
 
-int main(void)
-{
-	for (int i = 0x00; i < 0x100; i += 0x01){
-		struct instruction ins = instructions[i];
-		((void(*)(void))ins.function)();
-		printf("cycles: %d\n", ins.cycles);
-	}
-	return 0;
-
-}
-
 void doCpuStep(void)
 {
 	//pass in CPU struct?
