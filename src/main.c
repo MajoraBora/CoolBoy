@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "cpu.h"
 #include "registers.h"
 #include "memory.h"
 #include "gameboy.h"
+#include "cartridge.h"
 
 static void alterGameboy(struct gameboy * gameboy);
 
@@ -21,6 +23,8 @@ int main(void)
 	printf("%x\n", gameboy->cpu.pc);
 	alterGameboy(gameboy);
 	printf("%x\n", gameboy->cpu.af);
+
+	loadGame(gameboy, "sml.gb");
 	
 	destroyGameboy(gameboy);
 

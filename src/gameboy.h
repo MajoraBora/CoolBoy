@@ -10,6 +10,7 @@ struct gameboy {
 };
 
 struct gameboy * createGameboy();
+void reset(struct gameboy * gameboy);
 void destroyGameboy(struct gameboy * gameboy);
 
 #endif

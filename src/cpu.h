@@ -1,6 +1,7 @@
 #ifndef CPU_H
 #define CPU_H
-#include "registers.h"
+
+#include <stdint.h>
 
 /*
 Details:
@@ -36,9 +37,9 @@ Struct that represents an instruction, complete with a pointer to a function
 */
 struct instruction {
 	char * instruction;
-	unsigned char operandLength; //length of the operands for this opcode
+	uint8_t operandLength; //length of the operands for this opcode
 	void * function;
-	unsigned char cycles; //CPU cycles it takes to execute
+	uint8_t cycles; //CPU cycles it takes to execute
 };
 
 /*

@@ -1,6 +1,7 @@
+#include <stdint.h>
+#include "cpu.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "cpu.h"
 
 const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 	// 0x00 - 0x0F
