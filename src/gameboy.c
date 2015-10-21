@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "gameboy.h"
 #include "registers.h"
 
@@ -8,13 +9,15 @@ static void initialiseMemory(struct gameboy * gameboy);
 
 struct gameboy * createGameboy()
 {
+	printf("Creating GameBoy structure... ");
 	struct gameboy * gameboy;
-	gameboy = calloc(sizeof(struct gameboy), 0);
+	gameboy = malloc(sizeof(struct gameboy));
 	
 	if (gameboy == NULL){
 		//handle this in calling function
 		return NULL;
 	}
+	printf("done.\n");
 
 	reset(gameboy);
 	return gameboy;
@@ -29,12 +32,14 @@ void reset(struct gameboy * gameboy)
 
 static void initialiseCPU(struct gameboy * gameboy)
 {
+	printf("Resetting CPU... ");
 	gameboy->cpu.af = INIT_AF;
 	gameboy->cpu.bc = INIT_BC;
 	gameboy->cpu.de = INIT_DE;
 	gameboy->cpu.hl = INIT_HL;
 	gameboy->cpu.sp = INIT_STACK_POINTER;
 	gameboy->cpu.pc = INIT_PROGRAM_COUNTER;
+	printf("done.\n");
 
 }
 
@@ -43,6 +48,9 @@ static void initialiseMemory(struct gameboy * gameboy)
 	//initialise I/O stuff using writeMemory
 	//directly alter memory if needs be (eg certain timers that reset if written 
 	//to 'properly' through writeMemory)
+	printf("Resetting memory... ");
+	memset(gameboy->memory.mem, 0, sizeof(gameboy->memory.mem));
+	memset(gameboy->memory.cart, 0, sizeof(gameboy->memory.cart));
 
 	gameboy->memory.mem[0xFF05] = 0x0; //TIMA
 	gameboy->memory.mem[0xFF06] = 0x0;
@@ -75,6 +83,8 @@ static void initialiseMemory(struct gameboy * gameboy)
 	gameboy->memory.mem[0xFF4A] = 0x0;
 	gameboy->memory.mem[0xFF4B] = 0x0;
 	gameboy->memory.mem[0xFFFF] = 0x0;
+
+	printf("done\n");
 
 }
 

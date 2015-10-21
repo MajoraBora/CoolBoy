@@ -16,6 +16,9 @@
 #define ECHO_RAM_END 0xFE00
 #define ECHO_OFFSET 0x2000
 
+#define EX_RAM_START 0xA000
+#define EX_RAM_END 0xBFFF
+
 #define RESTRICTED_START 0xFEA0
 #define RESTRICTED_END 0xFEFF
 
@@ -47,12 +50,48 @@ struct memory {
 
 struct gameboy; //forward declaration
 
+enum mbcMode {
+	ROM_ONLY = 0x0,
+	MBC1 = 0x01, 
+	MBC1_RAM = 0x02,
+	MBC_RAM_BATTERY = 0x03,
+	MBC2 = 0x05,
+	MBC2_BATTERY = 0x06,	
+	ROM_RAM = 0x08, 
+	ROM_RAM_BATTERY = 0x09,
+	MMM01 = 0x0B,
+	MMM01_RAM = 0x0C, 
+	MMM01_RAM_BATTERY = 0x0D, 
+	MBC3_TIMER_RAM_BATTERY = 0x0F,
+	MBC3 = 0x11, 
+	MBC3_RAM = 0x12, 
+	MBC3_RAM_BATTERY = 0x13, 
+	MBC4 = 0x15, 
+	MBC4_RAM = 0x16, 
+	MBC4_RAM_BATTERY = 0x17, 
+	MBC5 = 0x19,
+	MBC5_RAM = 0x1A, 
+	MBC5_RAM_BATTERY = 0x1B, 
+	MBC5_RUMBLE = 0x1C, 
+	MBC5_RUMBLE_RAM = 0x1D, 
+	MBC5_RUMBLE_RAM_BATTERY = 0x1E, 
+	POCKET_CAMERA = 0xFC, 
+	BANDAIT_TAMA5 = 0xFD, 
+	HUC3 = 0xFE,
+	HUC1_RAM_BATTERY = 0xFF
+};
+
+
+
 struct memory {
 	uint8_t mem[TOTAL_MEMORY_SIZE];
 	uint8_t cart[MAX_CART_SIZE];
+	enum mbcMode bank;
 };
 
-void writeMemory(struct gameboy * gameboy, uint16_t address, uint8_t data);
-void readMemory(struct gameboy * gameboy, uint16_t address);
+void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data);
+void writeWord(struct gameboy * gameboy, uint16_t address, uint16_t data);
+uint8_t readByte(struct gameboy * gameboy, uint16_t address);
+uint16_t readWord(struct gameboy * gameboy, uint16_t address);
 
 #endif
