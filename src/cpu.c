@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "cpu.h"
+#include "gameboy.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -285,7 +286,7 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
         {"RST 30", 0, rest_30, 32},
         {"LDHL SP, d", 0, ldhl_sp_d, 12},
         {"LD SP, HL", 0, ld_sp_hl, 8},
-        {"LD A, (nn)", 2, ld_a_nn, 16},
+        {"LD A, (nn)", 2, ld_a_nnp, 16},
         {"EI", 0, ei, 4}, //enable pending interrupt
         {"UNDEFINED", 0, undefined, 0},
         {"UNDEFINED", 0, undefined, 0},
@@ -295,7 +296,7 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 
 };
 
-void doCpuStep(void)
+void doCpuStep(struct gameboy * gameboy)
 {
 	//pass in CPU struct?
 	//get next instruction from memory
@@ -309,729 +310,787 @@ void doCpuStep(void)
 	
 }
 
-void nop(void)
+void nop(struct gameboy * gameboy)
 {
 	printf("NOP\n");
 }
 
-void ld_bc_nn(void)
+void ld_bc_nn(struct gameboy * gameboy, uint16_t nn)
 {
 	printf("ld_bc_nn\n");
+	gameboy->cpu.bc = nn;
 }
 
-void ld_bc_a(void)
+void ld_bc_a(struct gameboy * gameboy)
 {
 	printf("ld_bc_a\n");
 }
 
-void inc_bc(void)
+void inc_bc(struct gameboy * gameboy)
 {
 	printf("inc_bc\n");
+	gameboy->cpu.bc++;
 }
 
-void inc_b(void)
+void inc_b(struct gameboy * gameboy)
 {
 	printf("inc_b\n");
 }
 
-void dec_b(void)
+void dec_b(struct gameboy * gameboy)
 {
 	printf("dec_b\n");
 }
 
-void ld_b_n(void)
+void ld_b_n(struct gameboy * gameboy, uint8_t n)
 {
 	printf("ld_b_n\n");
+	gameboy->cpu.b = n;
 }
 
-void rlc_a(void)
+void rlc_a(struct gameboy * gameboy)
 {
 	printf("rlc_a\n");
 }
 
-void ld_nn_sp(void)
+void ld_nn_sp(struct gameboy * gameboy)
 {
 	printf("ld_nn_sp\n");
 }
 
-void add_hl_bc(void)
+void add_hl_bc(struct gameboy * gameboy)
 {
 	printf("add_hl_bc\n");
 }
 
-void ld_a_bcp(void)
+void ld_a_bcp(struct gameboy * gameboy)
 {
 	printf("ld_a_bcp\n");
 }
 
-void dec_bc(void)
+void dec_bc(struct gameboy * gameboy)
 {
 	printf("dec_bc\n");
 }
 
-void inc_c(void)
+void inc_c(struct gameboy * gameboy)
 {
 	printf("inc_c\n");
 }
 
-void dec_c(void)
+void dec_c(struct gameboy * gameboy)
 {
 	printf("dec_c\n");
 }
 
-void ld_c_n(void)
+void ld_c_n(struct gameboy * gameboy, uint8_t n)
 {
 	printf("ld_c_n\n");
+	gameboy->cpu.c = n;
 }
 
-void rrc_a(void)
+void rrc_a(struct gameboy * gameboy)
 {
 	printf("rrc_a\n");
 }
 
-void stop(void) //0x10
+void stop(struct gameboy * gameboy) //0x10
 {
 	printf("stop\n");
 }
 
-void ld_de_nn(void) //0x11
+void ld_de_nn(struct gameboy * gameboy, uint16_t nn) //0x11
 {
 	printf("ld_de_nn\n");
+	gameboy->cpu.de = nn;
 }
 
-void ld_dep_a(void) //0x12
+void ld_dep_a(struct gameboy * gameboy) //0x12
 {
 	printf("ld_dep_a\n");
 }
 
-void inc_de(void) //0x13
+void inc_de(struct gameboy * gameboy) //0x13
 {
 	printf("inc_de\n");
+	gameboy->cpu.de++;
 }
 
-void inc_d(void) //0x14
+void inc_d(struct gameboy * gameboy) //0x14
 {
 	printf("inc_d\n");
 }
 
-void dec_d(void) //0x15
+void dec_d(struct gameboy * gameboy) //0x15
 {
 	printf("dec_d\n");
 }
 
-void ld_d_n(void) //0x16
+void ld_d_n(struct gameboy * gameboy, uint8_t n) //0x16
 {
 	printf("ld_d_n\n");
+	gameboy->cpu.d = n;
 }
 
-void rl_a(void) //0x17
+void rl_a(struct gameboy * gameboy) //0x17
 {
 	printf("rl_a\n");
 }
 
-void jr_n(void) //0x18
+void jr_n(struct gameboy * gameboy) //0x18
 {
 	printf("jr_n\n");
 }
 
-void add_hl_de(void) //0x19
+void add_hl_de(struct gameboy * gameboy) //0x19
 {
 	printf("add_hl_de\n");
 }
 
-void ld_a_dep(void) //0x1A
+void ld_a_dep(struct gameboy * gameboy) //0x1A
 {
 	printf("ld_a_dep\n");
 }
 
-void dec_de(void) //0x1B
+void dec_de(struct gameboy * gameboy) //0x1B
 {
 	printf("dec_de\n");
 }
 
-void inc_e(void) //0x1C
+void inc_e(struct gameboy * gameboy) //0x1C
 {
 	printf("inc_e\n");
 }
 
-void dec_e(void) //0x1D
+void dec_e(struct gameboy * gameboy) //0x1D
 {
 	printf("dec_e\n");
 }
 
-void ld_e_n(void) //0x1E
+void ld_e_n(struct gameboy * gameboy, uint8_t n) //0x1E
 {
 	printf("ld_e_n\n");
+	gameboy->cpu.e = n;
 }
 
-void rr_a(void) //0x1F
+void rr_a(struct gameboy * gameboy) //0x1F
 {
 	printf("rr_a\n");
 }
 
-void jr_nz_n(void)
+void jr_nz_n(struct gameboy * gameboy)
 {
 	printf("jr_nz_n\n");
 }
 
-void ld_hl_nn(void)
+void ld_hl_nn(struct gameboy * gameboy, uint16_t nn)
 {
 	printf("ld_hl_nn\n");
+	gameboy->cpu.hl = nn;
 }
 
-void ldi_hlp_a(void)
+void ldi_hlp_a(struct gameboy * gameboy)
 {
 	printf("ldi_hlp_a\n");
 }
 
-void inc_hl(void)
+void inc_hl(struct gameboy * gameboy)
 {
 	printf("inc_hl\n");
+	gameboy->cpu.hl++;
 }
 
-void inc_h(void)
+void inc_h(struct gameboy * gameboy)
 {
 	printf("inc_h\n");
 }
 
-void dec_h(void)
+void dec_h(struct gameboy * gameboy)
 {
 	printf("dec_h\n");
 }
 
-void ld_h_n(void)
+void ld_h_n(struct gameboy * gameboy, uint8_t n)
 {
 	printf("ld_h_n\n");
+	gameboy->cpu.h = n;
 }
 
-void daa(void)
+void daa(struct gameboy * gameboy)
 {
 	printf("daa\n");
 }
 
-void jr_z_n(void)
+void jr_z_n(struct gameboy * gameboy)
 {
 	printf("jr_z_n\n");
 }
 
-void add_hl_hl(void)
+void add_hl_hl(struct gameboy * gameboy)
 {
 	printf("add_hl_hl\n");
 }
 
-void ldi_a_hlp(void)
+void ldi_a_hlp(struct gameboy * gameboy)
 {
 	printf("ldi_a_hlp\n");
 }
 
-void dec_hl(void)
+void dec_hl(struct gameboy * gameboy)
 {
 	printf("dec_hl\n");
 }
 
-void ld_l_n(void)
+void ld_l_n(struct gameboy * gameboy, uint8_t n)
 {
 	printf("ld_l_n\n");
+	gameboy->cpu.l = n;
 }
 
-void cpl(void)
+void cpl(struct gameboy * gameboy)
 {
 	printf("cpl\n");
 }
 
-void jr_nc_n(void)
+void jr_nc_n(struct gameboy * gameboy)
 {
 	printf("jr_nc_n\n");
 }
 
-void ld_sp_nn(void)
+void ld_sp_nn(struct gameboy * gameboy, uint16_t nn)
 {
 	printf("ld_sp_nn\n");
+	gameboy->cpu.sp = nn;
 }
 
-void ldd_hlp_a(void)
+void ldd_hlp_a(struct gameboy * gameboy)
 {
 	printf("ldd_hlp_a\n");
 }
 
-void inc_sp(void)
+void inc_sp(struct gameboy * gameboy)
 {
 	printf("inc_sp\n");
+	gameboy->cpu.sp++;
 }
 
-void inc_hlp(void)
+void inc_hlp(struct gameboy * gameboy)
 {
 	printf("inc_hlp\n");
 }
 
-void dec_hlp(void)
+void dec_hlp(struct gameboy * gameboy)
 {
 	printf("dec_hlp\n");
 }
 
-void ld_hlp_n(void)
+void ld_hlp_n(struct gameboy * gameboy)
 {
 	printf("ld_hlp_n\n");
 }
 
-void scf(void)
+void scf(struct gameboy * gameboy)
 {
 	printf("scf\n");
 }
 
-void jr_c(void)
+void jr_c(struct gameboy * gameboy)
 {
 	printf("jr_c\n");
 }
 
-void add_hl_sp(void)
+void add_hl_sp(struct gameboy * gameboy)
 {
 	printf("add_hl_sp\n");
 }
 
-void ldd_a_hl(void)
+void ldd_a_hl(struct gameboy * gameboy)
 {
 	printf("ldd_a_hl\n");
 }
 
-void dec_sp(void)
+void dec_sp(struct gameboy * gameboy)
 {
 	printf("dec_sp\n");
 }
 
-void inc_a(void)
+void inc_a(struct gameboy * gameboy)
 {
 	printf("inc_a\n");
 }
 
-void dec_a(void)
+void dec_a(struct gameboy * gameboy)
 {
 	printf("dec_a\n");
 }
 
-void ld_a_n(void)
+void ld_a_n(struct gameboy * gameboy, uint8_t n)
 {
 	printf("ld_a_n\n");
+	gameboy->cpu.a = n;
 }
 
-void ccf(void)
+void ccf(struct gameboy * gameboy)
 {
 	printf("ccf\n");
 }
 
         // 0x40 - 0x4F
-void ld_b_b(void)
+void ld_b_b(struct gameboy * gameboy)
 {
 	printf("ld_b_b\n");
+	//do nothing
 }
 
-void ld_b_c(void)
+void ld_b_c(struct gameboy * gameboy)
 {
 	printf("ld_b_c\n");
+	gameboy->cpu.b = gameboy->cpu.c;
 }
 
-void ld_b_d(void)
+void ld_b_d(struct gameboy * gameboy)
 {
 	printf("ld_b_d\n");
+	gameboy->cpu.b = gameboy->cpu.d;
 }
 
-void ld_b_e(void)
+void ld_b_e(struct gameboy * gameboy)
 {
 	printf("ld_b_e\n");
+	gameboy->cpu.b = gameboy->cpu.e;
 }
 
-void ld_b_h(void)
+void ld_b_h(struct gameboy * gameboy)
 {
 	printf("ld_b_h\n");
+	gameboy->cpu.b = gameboy->cpu.h;
 }
 
-void ld_b_l(void)
+void ld_b_l(struct gameboy * gameboy)
 {
 	printf("ld_b_l\n");
+	gameboy->cpu.b = gameboy->cpu.l;
 }
 
-void ld_b_hlp(void)
+void ld_b_hlp(struct gameboy * gameboy)
 {
 	printf("ld_b_hlp\n");
 }
 
-void ld_b_a(void)
+void ld_b_a(struct gameboy * gameboy)
 {
 	printf("ld_b_a\n");
+	gameboy->cpu.b = gameboy->cpu.a;
 }
 
-void ld_c_b(void)
+void ld_c_b(struct gameboy * gameboy)
 {
 	printf("ld_c_b\n");
+	gameboy->cpu.c = gameboy->cpu.b;
 }
 
-void ld_c_c(void)
+void ld_c_c(struct gameboy * gameboy)
 {
 	printf("ld_c_c\n");
+	//do nothing
 }
 
-void ld_c_d(void)
+void ld_c_d(struct gameboy * gameboy)
 {
 	printf("ld_c_d\n");
+	gameboy->cpu.c = gameboy->cpu.d;
 }
 
-void ld_c_e(void)
+void ld_c_e(struct gameboy * gameboy)
 {
 	printf("ld_c_e\n");
+	gameboy->cpu.c = gameboy->cpu.e;
 }
 
-void ld_c_h(void)
+void ld_c_h(struct gameboy * gameboy)
 {
 	printf("ld_c_h\n");
+	gameboy->cpu.c = gameboy->cpu.h;
 }
 
-void ld_c_l(void)
+void ld_c_l(struct gameboy * gameboy)
 {
 	printf("ld_c_l\n");
+	gameboy->cpu.c = gameboy->cpu.l;
 }
 
-void ld_c_hlp(void)
+void ld_c_hlp(struct gameboy * gameboy)
 {
 	printf("ld_c_hlp\n");
 }
 
-void ld_c_a(void)
+void ld_c_a(struct gameboy * gameboy)
 {
 	printf("ld_c_a\n");
+	gameboy->cpu.c = gameboy->cpu.a;
 }
 
 
 
 //0x50 - 0x5F
 
-void ld_d_b(void)
+void ld_d_b(struct gameboy * gameboy)
 {
 	printf("ld_d_b\n");
+	gameboy->cpu.d = gameboy->cpu.b;
 }
 
-void ld_d_c(void)
+void ld_d_c(struct gameboy * gameboy)
 {
 	printf("ld_d_c\n");
+	gameboy->cpu.d = gameboy->cpu.c;
 }
 
-void ld_d_d(void)
+void ld_d_d(struct gameboy * gameboy)
 {
 	printf("ld_d_d\n");
+	//do nothing
 }
 
-void ld_d_e(void)
+void ld_d_e(struct gameboy * gameboy)
 {
 	printf("ld_d_e\n");
+	gameboy->cpu.d = gameboy->cpu.e;
 }
 
-void ld_d_h(void)
+void ld_d_h(struct gameboy * gameboy)
 {
 	printf("ld_d_h\n");
+	gameboy->cpu.d = gameboy->cpu.h;
 }
 
-void ld_d_l(void)
+void ld_d_l(struct gameboy * gameboy)
 {
 	printf("ld_d_l\n");
+	gameboy->cpu.d = gameboy->cpu.l;
 }
 
-void ld_d_hlp(void)
+void ld_d_hlp(struct gameboy * gameboy)
 {
 	printf("ld_d_hlp\n");
 }
 
-void ld_d_a(void)
+void ld_d_a(struct gameboy * gameboy)
 {
 	printf("ld_d_a\n");
+	gameboy->cpu.d = gameboy->cpu.a;
 }
 
-void ld_e_b(void)
+void ld_e_b(struct gameboy * gameboy)
 {
 	printf("ld_e_b\n");
+	gameboy->cpu.e = gameboy->cpu.b;
 }
 
-void ld_e_c(void)
+void ld_e_c(struct gameboy * gameboy)
 {
 	printf("ld_e_c\n");
+	gameboy->cpu.e = gameboy->cpu.c;
 }
 
-void ld_e_d(void)
+void ld_e_d(struct gameboy * gameboy)
 {
 	printf("ld_e_d\n");
+	gameboy->cpu.e = gameboy->cpu.d;
 }
 
-void ld_e_e(void)
+void ld_e_e(struct gameboy * gameboy)
 {
 	printf("ld_e_e\n");
+	//do nothing
 }
 
-void ld_e_h(void)
+void ld_e_h(struct gameboy * gameboy)
 {
 	printf("ld_e_h\n");
+	gameboy->cpu.e = gameboy->cpu.h;
 }
 
-void ld_e_l(void)
+void ld_e_l(struct gameboy * gameboy)
 {
 	printf("ld_e_l\n");
+	gameboy->cpu.e = gameboy->cpu.l;
 }
 
-void ld_e_hlp(void)
+void ld_e_hlp(struct gameboy * gameboy)
 {
 	printf("ld_e_hlp\n");
 }
 
-void ld_e_a(void)
+void ld_e_a(struct gameboy * gameboy)
 {
 	printf("ld_e_a\n");
+	gameboy->cpu.e = gameboy->cpu.a;
 }
 
+//0x60 - 0x6F
 
-
-        //0x60 - 0x6F
-
-void ld_h_b(void)
+void ld_h_b(struct gameboy * gameboy)
 {
 	printf("ld_h_b\n");
+	gameboy->cpu.h = gameboy->cpu.b;
 }
 
-void ld_h_c(void)
+void ld_h_c(struct gameboy * gameboy)
 {
 	printf("ld_h_c\n");
+	gameboy->cpu.h = gameboy->cpu.c;
 }
 
-void ld_h_d(void)
+void ld_h_d(struct gameboy * gameboy)
 {
 	printf("ld_h_d\n");
+	gameboy->cpu.h = gameboy->cpu.d;
 }
 
-void ld_h_e(void)
+void ld_h_e(struct gameboy * gameboy)
 {
 	printf("ld_h_e\n");
+	gameboy->cpu.h = gameboy->cpu.e;
 }
 
-void ld_h_h(void)
+void ld_h_h(struct gameboy * gameboy)
 {
 	printf("ld_h_h\n");
+	//do nothing
 }
 
-void ld_h_l(void)
+void ld_h_l(struct gameboy * gameboy)
 {
 	printf("ld_h_l\n");
+	gameboy->cpu.h = gameboy->cpu.l;
 }
 
-void ld_h_hlp(void)
+void ld_h_hlp(struct gameboy * gameboy)
 {
 	printf("ld_h_hlp\n");
 }
 
-void ld_h_a(void)
+void ld_h_a(struct gameboy * gameboy)
 {
 	printf("ld_h_a\n");
+	gameboy->cpu.h = gameboy->cpu.a;
 }
 
-void ld_l_b(void)
+void ld_l_b(struct gameboy * gameboy)
 {
 	printf("ld_l_b\n");
+	gameboy->cpu.l = gameboy->cpu.b;
 }
 
-void ld_l_c(void)
+void ld_l_c(struct gameboy * gameboy)
 {
 	printf("ld_l_c\n");
+	gameboy->cpu.l = gameboy->cpu.c;
 }
 
-void ld_l_d(void)
+void ld_l_d(struct gameboy * gameboy)
 {
 	printf("ld_l_d\n");
+	gameboy->cpu.l = gameboy->cpu.d;
 }
 
-void ld_l_e(void)
+void ld_l_e(struct gameboy * gameboy)
 {
 	printf("ld_l_e\n");
+	gameboy->cpu.l = gameboy->cpu.e;
 }
 
-void ld_l_h(void)
+void ld_l_h(struct gameboy * gameboy)
 {
 	printf("ld_l_h\n");
+	gameboy->cpu.l = gameboy->cpu.h;
 }
 
-void ld_l_l(void)
+void ld_l_l(struct gameboy * gameboy)
 {
 	printf("ld_l_l\n");
+	//do nothing
 }
 
-void ld_l_hlp(void)
+void ld_l_hlp(struct gameboy * gameboy)
 {
 	printf("ld_l_hlp\n");
 }
 
-void ld_l_a(void)
+void ld_l_a(struct gameboy * gameboy)
 {
 	printf("ld_l_a\n");
+	gameboy->cpu.l = gameboy->cpu.a;
 }
-
-
 
 //0x70-0x7F
 
-void ld_hlp_b(void)
+void ld_hlp_b(struct gameboy * gameboy)
 {
 	printf("ld_hlp_b\n");
 }
 
-void ld_hlp_c(void)
+void ld_hlp_c(struct gameboy * gameboy)
 {
 	printf("ld_hlp_c\n");
 }
 
-void ld_hlp_d(void)
+void ld_hlp_d(struct gameboy * gameboy)
 {
 	printf("ld_hlp_d\n");
 }
 
-void ld_hlp_e(void)
+void ld_hlp_e(struct gameboy * gameboy)
 {
 	printf("ld_hlp_e\n");
 }
 
-void ld_hlp_h(void)
+void ld_hlp_h(struct gameboy * gameboy)
 {
 	printf("ld_hlp_h\n");
 }
 
-void ld_hlp_l(void)
+void ld_hlp_l(struct gameboy * gameboy)
 {
 	printf("ld_hlp_l\n");
 }
 
-void halt(void)
+void halt(struct gameboy * gameboy)
 {
 	printf("halt\n");
 }
 
-void ld_hlp_a(void)
+void ld_hlp_a(struct gameboy * gameboy)
 {
 	printf("ld_hlp_a\n");
 }
 
-void ld_a_b(void)
+void ld_a_b(struct gameboy * gameboy)
 {
 	printf("ld_a_b\n");
+	gameboy->cpu.a = gameboy->cpu.b;
 }
 
-void ld_a_c(void)
+void ld_a_c(struct gameboy * gameboy)
 {
 	printf("ld_a_c\n");
+	gameboy->cpu.a = gameboy->cpu.c;
 }
 
-void ld_a_d(void)
+void ld_a_d(struct gameboy * gameboy)
 {
 	printf("ld_a_d\n");
+	gameboy->cpu.a = gameboy->cpu.d;
 }
 
-void ld_a_e(void)
+void ld_a_e(struct gameboy * gameboy)
 {
 	printf("ld_a_e\n");
+	gameboy->cpu.a = gameboy->cpu.e;
 }
 
-void ld_a_h(void)
+void ld_a_h(struct gameboy * gameboy)
 {
 	printf("ld_a_h\n");
+	gameboy->cpu.a = gameboy->cpu.h;
 }
 
-void ld_a_l(void)
+void ld_a_l(struct gameboy * gameboy)
 {
 	printf("ld_a_l\n");
+	gameboy->cpu.a = gameboy->cpu.l;
 }
 
-void ld_a_hlp(void)
+void ld_a_hlp(struct gameboy * gameboy)
 {
 	printf("ld_a_hlp\n");
 }
 
-void ld_a_a(void)
+void ld_a_a(struct gameboy * gameboy)
 {
 	printf("ld_a_a\n");
+	gameboy->cpu.a = gameboy->cpu.a;
 }
 
+//0x80 - 0x8F
 
-
-        //0x80 - 0x8F
-
-void add_a_b(void)
+void add_a_b(struct gameboy * gameboy)
 {
 	printf("add_a_b\n");
 }
 
-void add_a_c(void)
+void add_a_c(struct gameboy * gameboy)
 {
 	printf("add_a_c\n");
 }
 
-void add_a_d(void)
+void add_a_d(struct gameboy * gameboy)
 {
 	printf("add_a_d\n");
 }
 
-void add_a_e(void)
+void add_a_e(struct gameboy * gameboy)
 {
 	printf("add_a_e\n");
 }
 
-void add_a_h(void)
+void add_a_h(struct gameboy * gameboy)
 {
 	printf("add_a_h\n");
 }
 
-void add_a_l(void)
+void add_a_l(struct gameboy * gameboy)
 {
 	printf("add_a_l\n");
 }
 
-void add_a_hlp(void)
+void add_a_hlp(struct gameboy * gameboy)
 {
 	printf("add_a_hlp\n");
 }
 
-void add_a_a(void)
+void add_a_a(struct gameboy * gameboy)
 {
 	printf("add_a_a\n");
 }
 
-void adc_a_b(void)
+void adc_a_b(struct gameboy * gameboy)
 {
 	printf("adc_a_b\n");
 }
 
-void adc_a_c(void)
+void adc_a_c(struct gameboy * gameboy)
 {
 	printf("adc_a_c\n");
 }
 
-void adc_a_d(void)
+void adc_a_d(struct gameboy * gameboy)
 {
 	printf("adc_a_d\n");
 }
 
-void adc_a_e(void)
+void adc_a_e(struct gameboy * gameboy)
 {
 	printf("adc_a_e\n");
 }
 
-void adc_a_h(void)
+void adc_a_h(struct gameboy * gameboy)
 {
 	printf("adc_a_h\n");
 }
 
-void adc_a_l(void)
+void adc_a_l(struct gameboy * gameboy)
 {
 	printf("adc_a_l\n");
 }
 
-void adc_a_hlp(void)
+void adc_a_hlp(struct gameboy * gameboy)
 {
 	printf("adc_a_hlp\n");
 }
 
-void adc_a_a(void)
+void adc_a_a(struct gameboy * gameboy)
 {
 	printf("adc_a_a\n");
 }
@@ -1040,82 +1099,82 @@ void adc_a_a(void)
 
  //0x90 - 0x9F
 
-void sub_a_b(void)
+void sub_a_b(struct gameboy * gameboy)
 {
 	printf("sub_a_b\n");
 }
 
-void sub_a_c(void)
+void sub_a_c(struct gameboy * gameboy)
 {
 	printf("sub_a_c\n");
 }
 
-void sub_a_d(void)
+void sub_a_d(struct gameboy * gameboy)
 {
 	printf("sub_a_d\n");
 }
 
-void sub_a_e(void)
+void sub_a_e(struct gameboy * gameboy)
 {
 	printf("sub_a_e\n");
 }
 
-void sub_a_h(void)
+void sub_a_h(struct gameboy * gameboy)
 {
 	printf("sub_a_h\n");
 }
 
-void sub_a_l(void)
+void sub_a_l(struct gameboy * gameboy)
 {
 	printf("sub_a_l\n");
 }
 
-void sub_a_hlp(void)
+void sub_a_hlp(struct gameboy * gameboy)
 {
 	printf("sub_a_hlp\n");
 }
 
-void sub_a_a(void)
+void sub_a_a(struct gameboy * gameboy)
 {
 	printf("sub_a_a\n");
 }
 
-void sbc_a_b(void)
+void sbc_a_b(struct gameboy * gameboy)
 {
 	printf("sbc_a_b\n");
 }
 
-void sbc_a_c(void)
+void sbc_a_c(struct gameboy * gameboy)
 {
 	printf("sbc_a_c\n");
 }
 
-void sbc_a_d(void)
+void sbc_a_d(struct gameboy * gameboy)
 {
 	printf("sbc_a_d\n");
 }
 
-void sbc_a_e(void)
+void sbc_a_e(struct gameboy * gameboy)
 {
 	printf("sbc_a_e\n");
 }
 
-void sbc_a_h(void)
+void sbc_a_h(struct gameboy * gameboy)
 {
 	printf("sbc_a_h\n");
 }
 
-void sbc_a_l(void)
+void sbc_a_l(struct gameboy * gameboy)
 {
 	printf("sbc_a_l\n");
 }
 
-void sbc_a_hlp(void)
+void sbc_a_hlp(struct gameboy * gameboy)
 {
 	printf("sbc_a_hlp\n");
 }
 
-void sbc_a_a(void)
+void sbc_a_a(struct gameboy * gameboy)
 {
 	printf("sbc_a_a\n");
 }
@@ -1124,82 +1183,82 @@ void sbc_a_a(void)
 
         //0xA0 - 0xAF
 
-void and_b(void)
+void and_b(struct gameboy * gameboy)
 {
 	printf("and_b\n");
 }
 
-void and_c(void)
+void and_c(struct gameboy * gameboy)
 {
 	printf("and_c\n");
 }
 
-void and_d(void)
+void and_d(struct gameboy * gameboy)
 {
 	printf("and_d\n");
 }
 
-void and_e(void)
+void and_e(struct gameboy * gameboy)
 {
 	printf("and_e\n");
 }
 
-void and_h(void)
+void and_h(struct gameboy * gameboy)
 {
 	printf("and_h\n");
 }
 
-void and_l(void)
+void and_l(struct gameboy * gameboy)
 {
 	printf("and_l\n");
 }
 
-void and_hlp(void)
+void and_hlp(struct gameboy * gameboy)
 {
 	printf("and_hlp\n");
 }
 
-void and_a(void)
+void and_a(struct gameboy * gameboy)
 {
 	printf("and_a\n");
 }
 
-void xor_b(void)
+void xor_b(struct gameboy * gameboy)
 {
 	printf("xor_b\n");
 }
 
-void xor_c(void)
+void xor_c(struct gameboy * gameboy)
 {
 	printf("xor_c\n");
 }
 
-void xor_d(void)
+void xor_d(struct gameboy * gameboy)
 {
 	printf("xor_d\n");
 }
 
-void xor_e(void)
+void xor_e(struct gameboy * gameboy)
 {
 	printf("xor_e\n");
 }
 
-void xor_h(void)
+void xor_h(struct gameboy * gameboy)
 {
 	printf("xor_h\n");
 }
 
-void xor_l(void)
+void xor_l(struct gameboy * gameboy)
 {
 	printf("xor_l\n");
 }
 
-void xor_hlp(void)
+void xor_hlp(struct gameboy * gameboy)
 {
 	printf("xor_hlp\n");
 }
 
-void xor_a(void)
+void xor_a(struct gameboy * gameboy)
 {
 	printf("xor_a\n");
 }
@@ -1208,82 +1267,82 @@ void xor_a(void)
 
 //0xB0 - 0xBF
 
-void or_b(void)
+void or_b(struct gameboy * gameboy)
 {
 	printf("or_b\n");
 }
 
-void or_c(void)
+void or_c(struct gameboy * gameboy)
 {
 	printf("or_c\n");
 }
 
-void or_d(void)
+void or_d(struct gameboy * gameboy)
 {
 	printf("or_d\n");
 }
 
-void or_e(void)
+void or_e(struct gameboy * gameboy)
 {
 	printf("or_e\n");
 }
 
-void or_h(void)
+void or_h(struct gameboy * gameboy)
 {
 	printf("or_h\n");
 }
 
-void or_l(void)
+void or_l(struct gameboy * gameboy)
 {
 	printf("or_l\n");
 }
 
-void or_hlp(void)
+void or_hlp(struct gameboy * gameboy)
 {
 	printf("or_hlp\n");
 }
 
-void or_a(void)
+void or_a(struct gameboy * gameboy)
 {
 	printf("or_a\n");
 }
 
-void cp_b(void)
+void cp_b(struct gameboy * gameboy)
 {
 	printf("cp_b\n");
 }
 
-void cp_c(void)
+void cp_c(struct gameboy * gameboy)
 {
 	printf("cp_c\n");
 }
 
-void cp_d(void)
+void cp_d(struct gameboy * gameboy)
 {
 	printf("cp_d\n");
 }
 
-void cp_e(void)
+void cp_e(struct gameboy * gameboy)
 {
 	printf("cp_e\n");
 }
 
-void cp_h(void)
+void cp_h(struct gameboy * gameboy)
 {
 	printf("cp_h\n");
 }
 
-void cp_l(void)
+void cp_l(struct gameboy * gameboy)
 {
 	printf("cp_l\n");
 }
 
-void cp_hlp(void)
+void cp_hlp(struct gameboy * gameboy)
 {
 	printf("cp_hlp\n");
 }
 
-void cp_a(void)
+void cp_a(struct gameboy * gameboy)
 {
 	printf("cp_a\n");
 }
@@ -1292,82 +1351,82 @@ void cp_a(void)
 
         //0xC0 - 0xCF
 
-void ret_nz(void)
+void ret_nz(struct gameboy * gameboy)
 {
 	printf("ret_nz\n");
 }
 
-void pop_bc(void)
+void pop_bc(struct gameboy * gameboy)
 {
 	printf("pop_bc\n");
 }
 
-void jp_nz(void)
+void jp_nz(struct gameboy * gameboy)
 {
 	printf("jp_nz\n");
 }
 
-void jp_nn(void)
+void jp_nn(struct gameboy * gameboy)
 {
 	printf("jp_nn\n");
 }
 
-void call_nz_nn(void)
+void call_nz_nn(struct gameboy * gameboy)
 {
 	printf("call_nz_nn\n");
 }
 
-void push_bc(void)
+void push_bc(struct gameboy * gameboy)
 {
 	printf("push_bc\n");
 }
 
-void add_a_n(void)
+void add_a_n(struct gameboy * gameboy)
 {
 	printf("add_a_n\n");
 }
 
-void rst_0(void)
+void rst_0(struct gameboy * gameboy)
 {
 	printf("rst_0\n");
 }
 
-void ret_z(void)
+void ret_z(struct gameboy * gameboy)
 {
 	printf("ret_z\n");
 }
 
-void ret(void)
+void ret(struct gameboy * gameboy)
 {
 	printf("ret\n");
 }
 
-void jp_z_nn(void)
+void jp_z_nn(struct gameboy * gameboy)
 {
 	printf("jp_z_nn\n");
 }
 
-void ext_ops(void)
+void ext_ops(struct gameboy * gameboy)
 {
 	printf("ext_ops\n");
 }
 
-void call_z_nn(void)
+void call_z_nn(struct gameboy * gameboy)
 {
 	printf("call_z_nn\n");
 }
 
-void call_nn(void)
+void call_nn(struct gameboy * gameboy)
 {
 	printf("call_nn\n");
 }
 
-void adc_a_n(void)
+void adc_a_n(struct gameboy * gameboy)
 {
 	printf("adc_a_n\n");
 }
 
-void rst_8(void)
+void rst_8(struct gameboy * gameboy)
 {
 	printf("rst_8\n");
 }
@@ -1376,68 +1435,68 @@ void rst_8(void)
 
 //0xD0 - 0xDF
 
-void ret_nc(void)
+void ret_nc(struct gameboy * gameboy)
 {
 	printf("ret_nc\n");
 }
 
-void pop_de(void)
+void pop_de(struct gameboy * gameboy)
 {
 	printf("pop_de\n");
 }
 
-void jp_nc(void)
+void jp_nc(struct gameboy * gameboy)
 {
 	printf("jp_nc\n");
 }
 
-void call_nc_nn(void)
+void call_nc_nn(struct gameboy * gameboy)
 {
 	printf("call_nc_nn\n");
 }
 
-void push_de(void)
+void push_de(struct gameboy * gameboy)
 {
 	printf("push_de\n");
 }
 
-void sub_a_n(void)
+void sub_a_n(struct gameboy * gameboy)
 {
 	printf("sub_a_n\n");
 }
 
-void rst_10(void)
+void rst_10(struct gameboy * gameboy)
 {
 	printf("rst_10\n");
 }
 
-void ret_c(void)
+void ret_c(struct gameboy * gameboy)
 {
 	printf("ret_c\n");
 }
 
 
-void reti(void)
+void reti(struct gameboy * gameboy)
 {
 	printf("reti\n");
 }
 
-void jp_c_nn(void)
+void jp_c_nn(struct gameboy * gameboy)
 {
 	printf("jp_c_nn\n");
 }
 
-void call_c_nn(void)
+void call_c_nn(struct gameboy * gameboy)
 {
 	printf("call_c_nn\n");
 }
 
-void sbc_a_n(void)
+void sbc_a_n(struct gameboy * gameboy)
 {
 	printf("sbc_a_n\n");
 }
 
-void rst_18(void)
+void rst_18(struct gameboy * gameboy)
 {
 	printf("rst_18\n");
 }
@@ -1446,127 +1505,134 @@ void rst_18(void)
 
         //0xE0 - 0xEF
 
-void ldh_n_a(void)
+void ldh_n_a(struct gameboy * gameboy, uint8_t n)
 {
 	printf("ldh_n_a\n");
+	//put a into memory address FF00+n
+	writeByte(gameboy, LDH_BASE + n, gameboy->cpu.a);
 }
 
-void pop_hl(void)
+void pop_hl(struct gameboy * gameboy)
 {
 	printf("pop_hl\n");
 }
 
-void ldh_c_a(void)
+void ldh_c_a(struct gameboy * gameboy)
 {
 	printf("ldh_c_a\n");
+	//put A into address FF00 + reg C
+	writeByte(gameboy, LDH_BASE + gameboy->cpu.c, gameboy->cpu.a);
 }
 
-void push_hl(void)
+void push_hl(struct gameboy * gameboy)
 {
 	printf("push_hl\n");
 }
 
-void and_n(void)
+void and_n(struct gameboy * gameboy)
 {
 	printf("and_n\n");
 }
 
-void rest_20(void)
+void rest_20(struct gameboy * gameboy)
 {
 	printf("rest_20\n");
 }
 
-void add_sp_d(void)
+void add_sp_d(struct gameboy * gameboy)
 {
 	printf("add_sp_d\n");
 }
 
-void jp_hlp(void)
+void jp_hlp(struct gameboy * gameboy)
 {
 	printf("jp_hlp\n");
 }
 
-void ld_nn_a(void)
+void ld_nn_a(struct gameboy * gameboy)
 {
 	printf("ld_nn_a\n");
 }
 
-void xor_n(void)
+void xor_n(struct gameboy * gameboy)
 {
 	printf("xor_n\n");
 }
 
-void rst_28(void)
+void rst_28(struct gameboy * gameboy)
 {
 	printf("rst_28\n");
 }
 
- 
-
   //0xF0 - 0xFF
 
-void ldh_a_n(void)
+void ldh_a_n(struct gameboy * gameboy, uint8_t n)
 {
 	printf("ldh_a_n\n");
+	//put memory address FF00 + n into A
+	gameboy->cpu.a = readByte(gameboy, LDH_BASE + n);
+	
 }
 
-void pop_af(void)
+void pop_af(struct gameboy * gameboy)
 {
 	printf("pop_af\n");
 }
 
-void di(void)
+void di(struct gameboy * gameboy)
 {
 	printf("di\n");
 }
 
-void push_af(void)
+void push_af(struct gameboy * gameboy)
 {
 	printf("push_af\n");
 }
 
-void or_n(void)
+void or_n(struct gameboy * gameboy)
 {
 	printf("or_n\n");
 }
 
-void rest_30(void)
+void rest_30(struct gameboy * gameboy)
 {
 	printf("rest_30\n");
 }
 
-void ldhl_sp_d(void)
+void ldhl_sp_d(struct gameboy * gameboy)
 {
 	printf("ldhl_sp_d\n");
+	
 }
 
-void ld_sp_hl(void)
+void ld_sp_hl(struct gameboy * gameboy)
 {
 	printf("ld_sp_hl\n");
+	gameboy->cpu.sp = gameboy->cpu.hl;
 }
 
-void ld_a_nn(void)
+void ld_a_nnp(struct gameboy * gameboy)
 {
 	printf("ld_a_nn\n");
 }
 
-void ei(void)
+void ei(struct gameboy * gameboy)
 {
 	printf("ei\n");
 }
 
-void cp_n(void)
+void cp_n(struct gameboy * gameboy)
 {
 	printf("cp_n\n");
 }
 
-void rst_38(void)
+void rst_38(struct gameboy * gameboy)
 {
 	printf("rst_38\n");
 }
 
 
-void undefined(void)
+void undefined(struct gameboy * gameboy)
 {
 	printf("undefined\n");
 }
