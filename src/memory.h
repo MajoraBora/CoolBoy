@@ -2,6 +2,7 @@
 #define MEMORY_H 
 
 #include <stdint.h>
+#include "cartridge.h"
 
 #define TOTAL_MEMORY_SIZE 0xFFFF
 #define MAX_CART_SIZE 0x20000
@@ -52,7 +53,7 @@ struct memory {
 */
 
 struct gameboy; //forward declaration
-
+/*
 enum mbcMode {
 	ROM_ONLY = 0x0,
 	MBC1 = 0x01, 
@@ -83,13 +84,18 @@ enum mbcMode {
 	HUC3 = 0xFE,
 	HUC1_RAM_BATTERY = 0xFF
 };
-
+*/
 
 
 struct memory {
 	uint8_t mem[TOTAL_MEMORY_SIZE];
 	uint8_t cart[MAX_CART_SIZE];
 	enum mbcMode bank;
+	uint16_t romBankCount;
+	uint16_t ramBankCount;
+	int romSize;
+	int ramSize;
+	char * destination;
 };
 
 void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data);

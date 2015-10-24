@@ -102,7 +102,7 @@ struct cpu {
 
 struct gameboy;
 
-void executeNextOpcode(struct gameboy * gameboy);
+uint8_t executeNextOpcode(struct gameboy * gameboy);
 
 // 0x00 - 0x0F
 void nop(struct gameboy * gameboy); //0

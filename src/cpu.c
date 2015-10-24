@@ -296,8 +296,9 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 
 };
 
-void executeNextOpcode(struct gameboy * gameboy)
+uint8_t executeNextOpcode(struct gameboy * gameboy)
 {
+	//need to put game into main memory, sort out memory banks etc
 	uint8_t opcode = readByte(gameboy, gameboy->cpu.pc++);
 	const struct instruction instruction = instructions[opcode];
 
@@ -325,7 +326,7 @@ void executeNextOpcode(struct gameboy * gameboy)
 		}
 	}
 
-	
+	return instruction.cycles;
 }
 
 void doCpuStep(struct gameboy * gameboy)

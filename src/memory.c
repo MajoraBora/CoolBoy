@@ -41,6 +41,7 @@ void writeWord(struct gameboy * gameboy, uint16_t address, uint16_t data)
 uint8_t readByte(struct gameboy * gameboy, uint16_t address)
 {
 	//certain reads reset certain timers, implement this later
+	//sort out ram/rom banks
 	return gameboy->memory.mem[address];
 }
 
