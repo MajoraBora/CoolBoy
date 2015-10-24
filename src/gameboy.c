@@ -24,6 +24,16 @@ struct gameboy * createGameboy()
 	
 }
 
+void startEmulationLoop(struct gameboy * gameboy)
+{
+	//get instruction
+	//execute instruction
+	for (int i = 0; i < 3; i++){
+		executeNextOpcode(gameboy);
+	}
+	//increment things
+}
+
 void reset(struct gameboy * gameboy)
 {
 	initialiseCPU(gameboy);

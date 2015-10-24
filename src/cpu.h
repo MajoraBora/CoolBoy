@@ -102,6 +102,8 @@ struct cpu {
 
 struct gameboy;
 
+void executeNextOpcode(struct gameboy * gameboy);
+
 // 0x00 - 0x0F
 void nop(struct gameboy * gameboy); //0
 void ld_bc_nn(struct gameboy * gameboy, uint16_t nn); //1

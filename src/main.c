@@ -14,6 +14,8 @@ int main(void)
 	gameboy = createGameboy();
 
 	loadGame(gameboy, "sml.gb");
+
+	startEmulationLoop(gameboy);
 	
 	destroyGameboy(gameboy);
 

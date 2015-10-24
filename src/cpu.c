@@ -296,6 +296,38 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 
 };
 
+void executeNextOpcode(struct gameboy * gameboy)
+{
+	uint8_t opcode = readByte(gameboy, gameboy->cpu.pc++);
+	const struct instruction instruction = instructions[opcode];
+
+	printf("%x\n", gameboy->cpu.pc);
+
+	switch(instruction.operandLength){
+		case 0:
+		{
+			//no operands, just run it
+			((void(*)(struct gameboy *))instruction.function)(gameboy);
+			break;
+		}
+		case 1:
+		{
+			//1 operand, get byte
+			uint8_t byte = readByte(gameboy, gameboy->cpu.pc);
+			((void(*)(struct gameboy *, uint8_t))instruction.function)(gameboy, byte);
+			break;
+		}
+		case 2:
+		{
+			uint16_t word = readWord(gameboy, gameboy->cpu.pc);
+			((void(*)(struct gameboy *, uint16_t))instruction.function)(gameboy, word);
+			break;
+		}
+	}
+
+	
+}
+
 void doCpuStep(struct gameboy * gameboy)
 {
 	//pass in CPU struct?

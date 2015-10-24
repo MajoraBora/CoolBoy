@@ -44,7 +44,7 @@ void printCartDetails(struct gameboy * gameboy)
 	printf("\nCART DETAILS:\n\n");
 	printf("\tCart name: ");
 	for (int i = 0x134; i <= 0x143; i += 0x01){
-		printf("%c ", gameboy->memory.cart[i]);
+		printf("%c", gameboy->memory.cart[i]);
 	}
 	printf("\n");
 	

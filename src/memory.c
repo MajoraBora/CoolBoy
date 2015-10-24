@@ -1,10 +1,8 @@
+#include "memory.h"
 #include "gameboy.h"
-
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "gameboy.h"
-#include "memory.h"
 
 void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data)
 {
@@ -14,9 +12,14 @@ void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data)
 	}
 
 	//anything written to echo RAM should be written to work RAM.
-	else if ((address >= ECHO_RAM_START) && (address < ECHO_RAM_END)){
+	else if ((address >= ECHO_RAM_START_UPPER) && (address < ECHO_RAM_END_UPPER)){
 		gameboy->memory.mem[address] = data;
-		writeByte(gameboy, address - ECHO_OFFSET, data);
+		gameboy->memory.mem[address - ECHO_OFFSET] = data;
+	}
+
+	else if ((address >= ECHO_RAM_START_LOWER) && (address < ECHO_RAM_END_LOWER)){
+		gameboy->memory.mem[address] = data;
+		gameboy->memory.mem[address + ECHO_OFFSET] = data;
 	}
 
 	else if ((address >= RESTRICTED_START) && (address < RESTRICTED_END)){
@@ -37,7 +40,8 @@ void writeWord(struct gameboy * gameboy, uint16_t address, uint16_t data)
 
 uint8_t readByte(struct gameboy * gameboy, uint16_t address)
 {
-	return 0;
+	//certain reads reset certain timers, implement this later
+	return gameboy->memory.mem[address];
 }
 
 uint16_t readWord(struct gameboy * gameboy, uint16_t address)

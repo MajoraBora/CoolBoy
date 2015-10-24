@@ -1,6 +1,7 @@
 #ifndef MEMORY_H 
 #define MEMORY_H 
 
+#include <stdint.h>
 
 #define TOTAL_MEMORY_SIZE 0xFFFF
 #define MAX_CART_SIZE 0x20000
@@ -12,8 +13,10 @@
 #define IO_SIZE 0x100
 #define HIGH_RAM_SIZE 0x80
 
-#define ECHO_RAM_START 0xE000
-#define ECHO_RAM_END 0xFE00
+#define ECHO_RAM_START_UPPER 0xE000
+#define ECHO_RAM_END_UPPER 0xFE00
+#define ECHO_RAM_START_LOWER 0xC000
+#define ECHO_RAM_END_LOWER 0xDE00
 #define ECHO_OFFSET 0x2000
 
 #define EX_RAM_START 0xA000
