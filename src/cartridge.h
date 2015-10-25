@@ -6,7 +6,9 @@
 #define MBC_MODE_ADDRESS 0x147
 #define ROM 0x148
 #define EXTERNAL_RAM 0x149
-#define DESTINATION 0x14A
+#define LOCALE 0x14A
+
+#define MAX_CART_SIZE 0x20000
 
 enum mbcMode {
         ROM_ONLY = 0x0,
@@ -39,6 +41,16 @@ enum mbcMode {
         HUC1_RAM_BATTERY = 0xFF
 };
 
+struct cartridge {
+	uint8_t memory[MAX_CART_SIZE];
+	enum mbcMode bankMode;
+	uint16_t romBankCount;
+	uint16_t ramBankCount;
+	int romSize;
+	int ramSize;
+	char * locale;
+};
+
 struct romInfo {
 	float size; //size of ROM in bytes
 	uint16_t noOfBanks; //number of ROM banks
@@ -51,7 +63,7 @@ struct ramInfo {
 
 extern struct romInfo romInfoChoices[0x54];
 extern struct ramInfo ramInfoChoices[0x03];
-extern char * destinations[0x2];
+extern char * locales[0x2];
 
 struct gameboy;
 
@@ -59,7 +71,7 @@ void loadGame(struct gameboy * gameboy, const char * directory);
 void loadBankType(struct gameboy * gameboy);
 void loadRomInfo(struct gameboy * gameboy);
 void loadRamInfo(struct gameboy * gameboy);
-void loadDestinationInfo(struct gameboy * gameboy);
+void loadLocaleInfo(struct gameboy * gameboy);
 void printCartDetails(struct gameboy * gameboy);
 
 #endif

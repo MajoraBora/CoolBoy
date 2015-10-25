@@ -65,7 +65,7 @@ static void initialiseMemory(struct gameboy * gameboy)
 	//to 'properly' through writeMemory)
 	printf("Resetting memory... ");
 	memset(gameboy->memory.mem, 0, sizeof(gameboy->memory.mem));
-	memset(gameboy->memory.cart, 0, sizeof(gameboy->memory.cart));
+	memset(gameboy->cartridge.memory, 0, sizeof(gameboy->cartridge.memory));
 
 	gameboy->memory.mem[0xFF05] = 0x0; //TIMA
 	gameboy->memory.mem[0xFF06] = 0x0;

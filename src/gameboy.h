@@ -7,6 +7,7 @@
 struct gameboy {
 	struct cpu cpu;
 	struct memory memory;
+	struct cartridge cartridge;
 	//have an error code field - if an error occurs, set it, exit the emu loop, 
 	//then let the calling scope extract and handle it
 	//struct error error;

@@ -1,5 +1,6 @@
 #include "cartridge.h"
 #include "gameboy.h"
+#include "mbc.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,12 +8,12 @@
 
 struct romInfo romInfoChoices[0x54];
 struct ramInfo ramInfoChoices[0x03];
-char * destinations[0x2];
+char * locales[0x2];
 
 static bool isValidGame(const char * directory);
 static void initialiseRomBankChoices();
 static void initialiseRamBankChoices();
-static void initialiseDestinationChoices();
+static void initialiseLocaleChoices();
 
 void loadGame(struct gameboy * gameboy, const char * directory)
 {
@@ -30,15 +31,17 @@ void loadGame(struct gameboy * gameboy, const char * directory)
 		exit(-1); //implement better error handling system
 	}
 
-	fread(gameboy->memory.cart, 1, MAX_CART_SIZE, game);
+	fread(gameboy->cartridge.memory, 1, MAX_CART_SIZE, game);
 	fclose(game);
-	//load first 0x8000 into gameboy memory
-	memcpy(&gameboy->memory.mem, &gameboy->memory.cart, CARTRIDGE_SIZE);
+	//load first 0x8000 into gameboy memory - do this with MBC functionality
+	//memcpy(&gameboy->memory.mem, &gameboy->cartridge.memory, CARTRIDGE_SIZE);
 
 	loadBankType(gameboy);
 	loadRomInfo(gameboy);
 	loadRamInfo(gameboy);
-	loadDestinationInfo(gameboy);
+	loadLocaleInfo(gameboy);
+
+	initialiseRomBanks(gameboy); 
 
 	printf("done.\n");
 	
@@ -48,16 +51,17 @@ void loadGame(struct gameboy * gameboy, const char * directory)
 
 void loadBankType(struct gameboy * gameboy)
 {
-	gameboy->memory.bank = gameboy->memory.cart[MBC_MODE_ADDRESS];
+	gameboy->cartridge.bankMode = gameboy->cartridge.memory[MBC_MODE_ADDRESS];
+	//pokemon red and blue are coming up MBC5 when they are MBC3 in real life
 
 }
 
 void loadRomInfo(struct gameboy * gameboy)
 {
 	initialiseRomBankChoices();
-	uint8_t bankCode = gameboy->memory.mem[ROM];
-	gameboy->memory.romBankCount = romInfoChoices[bankCode].noOfBanks;
-	gameboy->memory.romSize = romInfoChoices[bankCode].size;
+	uint8_t bankCode = gameboy->cartridge.memory[ROM];
+	gameboy->cartridge.romBankCount = romInfoChoices[bankCode].noOfBanks;
+	gameboy->cartridge.romSize = romInfoChoices[bankCode].size;
 }
 
 static void initialiseRomBankChoices()
@@ -105,23 +109,23 @@ static void initialiseRamBankChoices()
 void loadRamInfo(struct gameboy * gameboy)
 {
 	initialiseRamBankChoices();
-	uint8_t bankCode = gameboy->memory.mem[EXTERNAL_RAM];
-        gameboy->memory.ramBankCount = ramInfoChoices[bankCode].noOfBanks;
-        gameboy->memory.ramSize = ramInfoChoices[bankCode].size;
+	uint8_t bankCode = gameboy->cartridge.memory[EXTERNAL_RAM];
+        gameboy->cartridge.ramBankCount = ramInfoChoices[bankCode].noOfBanks;
+        gameboy->cartridge.ramSize = ramInfoChoices[bankCode].size;
 	
 }
 
-void loadDestinationInfo(struct gameboy * gameboy)
+void loadLocaleInfo(struct gameboy * gameboy)
 {
-	initialiseDestinationChoices();
-	int destinationCode = gameboy->memory.cart[DESTINATION];
-	gameboy->memory.destination = destinations[destinationCode];
+	initialiseLocaleChoices();
+	int localeCode= gameboy->cartridge.memory[LOCALE];
+	gameboy->cartridge.locale = locales[localeCode];
 }
 
-static void initialiseDestinationChoices()
+static void initialiseLocaleChoices()
 {
-	destinations[0] = "Japanese";
-	destinations[1] = "Non-Japanese";
+	locales[0] = "Japanese";
+	locales[1] = "Non-Japanese";
 }
 
 void printCartDetails(struct gameboy * gameboy)
@@ -129,14 +133,14 @@ void printCartDetails(struct gameboy * gameboy)
 	printf("\nCART DETAILS:\n\n");
 	printf("\tCart name: ");
 	for (int i = 0x134; i <= 0x143; i += 0x01){
-		printf("%c", gameboy->memory.cart[i]);
+		printf("%c", gameboy->cartridge.memory[i]);
 	}
 	printf("\n");
 	
 	//printf("\tBank code: %x\n", gameboy->memory.bank);
-	printf("\tROM size: %d bytes\n", gameboy->memory.romSize);
-	printf("\tRAM size: %d bytes\n", gameboy->memory.ramSize);
-	printf("\tDestination: %s\n", gameboy->memory.destination);
+	printf("\tROM size: %d bytes\n", gameboy->cartridge.romSize);
+	printf("\tRAM size: %d bytes\n", gameboy->cartridge.ramSize);
+	printf("\tLocale: %s\n", gameboy->cartridge.locale);
 
 }
 

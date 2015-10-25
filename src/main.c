@@ -13,7 +13,7 @@ int main(void)
 	struct gameboy * gameboy;
 	gameboy = createGameboy();
 
-	loadGame(gameboy, "pokered.gb");
+	loadGame(gameboy, "sml.gb");
 
 	startEmulationLoop(gameboy);
 	
