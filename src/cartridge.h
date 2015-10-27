@@ -2,6 +2,7 @@
 #define CARTRIDGE_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define MBC_MODE_ADDRESS 0x147
 #define ROM 0x148
@@ -9,6 +10,7 @@
 #define LOCALE 0x14A
 
 #define MAX_CART_SIZE 0x20000
+#define RAM_BANK_SIZE 0x2000
 
 enum mbcMode {
         ROM_ONLY = 0x0,
@@ -43,7 +45,12 @@ enum mbcMode {
 
 struct cartridge {
 	uint8_t memory[MAX_CART_SIZE];
+	uint8_t ramBanks[RAM_BANK_SIZE];
 	enum mbcMode bankMode;
+	uint8_t currentROMBank;
+	uint8_t currentRAMBank;
+	bool romBanking; //defaults to true
+	bool ramEnabled;
 	uint16_t romBankCount;
 	uint16_t ramBankCount;
 	int romSize;

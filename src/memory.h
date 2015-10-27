@@ -14,6 +14,7 @@
 #define SPRITE_TABLE_SIZE 0x100
 #define IO_SIZE 0x100
 #define HIGH_RAM_SIZE 0x80
+#define RAM_BANK_SIZE 0x2000
 
 #define ECHO_RAM_START_UPPER 0xE000
 #define ECHO_RAM_END_UPPER 0xFE00
@@ -24,8 +25,22 @@
 #define EX_RAM_START 0xA000
 #define EX_RAM_END 0xBFFF
 
+#define MBANK_START 0x4000
+#define MBANK_END 0x7FFF
+
+#define RAM_BANK_START 0xA000
+#define RAM_BANK_END 0xBFFF
+
 #define RESTRICTED_START 0xFEA0
 #define RESTRICTED_END 0xFEFF
+
+#define RAM_BANK_ENABLE_UPPER 0x2000
+#define ROM_BANK_NUMBER_LOWER 0x2000 
+#define ROM_BANK_NUMBER_UPPER 0x3FFF
+#define RAM_ROM_BANK_NUMBER_LOWER 0x4000
+#define RAM_ROM_BANK_NUMBER_UPPER 0x5FFF
+#define ROM_RAM_MODE_SELECT_LOWER 0x6000
+#define ROM_RAM_MODE_SELECT_UPPER 0x7FFF
 
 /*
 struct memory {
@@ -90,8 +105,6 @@ enum mbcMode {
 
 struct memory {
 	uint8_t mem[TOTAL_MEMORY_SIZE];
-	uint8_t currentBank;
-	bool externalRamEnabled;
 };
 
 void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data);
