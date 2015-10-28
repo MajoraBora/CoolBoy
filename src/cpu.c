@@ -1,6 +1,7 @@
-#include <stdint.h>
 #include "cpu.h"
 #include "gameboy.h"
+#include "stack.h"
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -8,7 +9,7 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 	// 0x00 - 0x0F
 	{"NOP", 0, nop, 4},
 	{"LD BC NN", 2, ld_bc_nn, 12},
-	{"LD (BC), A", 0, ld_bc_a, 8},
+	{"LD (BC), A", 0, ld_bcp_a, 8},
 	{"INC BC", 0, inc_bc, 8},
 	{"INC B", 0, inc_b, 4},
 	{"DEC B", 0, dec_b, 4},
@@ -268,7 +269,7 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 	{"RST 20", 0, rest_20, 32},
 	{"ADD SP, d", 0, add_sp_d, 16},
 	{"JP (HL)", 0, jp_hlp, 4},
-	{"LD (nn), A", 2, ld_nn_a, 16},
+	{"LD (nn), A", 2, ld_nnp_a, 16},
 	{"UNDEFINED", 0, undefined, 0},
 	{"UNDEFINED", 0, undefined, 0},
 	{"UNDEFINED", 0, undefined, 0},
@@ -329,20 +330,6 @@ uint8_t executeNextOpcode(struct gameboy * gameboy)
 	return instruction.cycles;
 }
 
-void doCpuStep(struct gameboy * gameboy)
-{
-	//pass in CPU struct?
-	//get next instruction from memory
-	//if instruction operand length is 1 or 2, get args
-	//increment pc by 1 or 2
-	//depending on operand length, cast instruction void pointer to 
-	//void function, void function that takes a char, or a void function
-	//that takes a short
-	//execute function
-	//increment CPU ticks by instruction's tick count - make array for this
-	
-}
-
 void nop(struct gameboy * gameboy)
 {
 	printf("NOP\n");
@@ -354,9 +341,11 @@ void ld_bc_nn(struct gameboy * gameboy, uint16_t nn)
 	gameboy->cpu.bc = nn;
 }
 
-void ld_bc_a(struct gameboy * gameboy)
+void ld_bcp_a(struct gameboy * gameboy)
 {
-	printf("ld_bc_a\n");
+	printf("ld_bc_a\n"); //0x02
+	//read the value in BC as an address, then write the value in A to it
+	writeByte(gameboy, gameboy->cpu.bc, gameboy->cpu.a);
 }
 
 void inc_bc(struct gameboy * gameboy)
@@ -440,6 +429,7 @@ void ld_de_nn(struct gameboy * gameboy, uint16_t nn) //0x11
 
 void ld_dep_a(struct gameboy * gameboy) //0x12
 {
+	writeByte(gameboy, gameboy->cpu.de, gameboy->cpu.a);
 	printf("ld_dep_a\n");
 }
 
@@ -525,6 +515,7 @@ void ld_hl_nn(struct gameboy * gameboy, uint16_t nn)
 void ldi_hlp_a(struct gameboy * gameboy)
 {
 	printf("ldi_hlp_a\n");
+	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.a);
 }
 
 void inc_hl(struct gameboy * gameboy)
@@ -599,6 +590,7 @@ void ld_sp_nn(struct gameboy * gameboy, uint16_t nn)
 void ldd_hlp_a(struct gameboy * gameboy)
 {
 	printf("ldd_hlp_a\n");
+	
 }
 
 void inc_sp(struct gameboy * gameboy)
@@ -617,9 +609,10 @@ void dec_hlp(struct gameboy * gameboy)
 	printf("dec_hlp\n");
 }
 
-void ld_hlp_n(struct gameboy * gameboy)
+void ld_hlp_n(struct gameboy * gameboy, uint8_t data)
 {
 	printf("ld_hlp_n\n");
+	writeByte(gameboy, gameboy->cpu.hl, data);
 }
 
 void scf(struct gameboy * gameboy)
@@ -708,6 +701,7 @@ void ld_b_l(struct gameboy * gameboy)
 void ld_b_hlp(struct gameboy * gameboy)
 {
 	printf("ld_b_hlp\n");
+	gameboy->cpu.b = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_b_a(struct gameboy * gameboy)
@@ -755,6 +749,7 @@ void ld_c_l(struct gameboy * gameboy)
 void ld_c_hlp(struct gameboy * gameboy)
 {
 	printf("ld_c_hlp\n");
+	gameboy->cpu.c = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_c_a(struct gameboy * gameboy)
@@ -806,6 +801,7 @@ void ld_d_l(struct gameboy * gameboy)
 void ld_d_hlp(struct gameboy * gameboy)
 {
 	printf("ld_d_hlp\n");
+	gameboy->cpu.d = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_d_a(struct gameboy * gameboy)
@@ -853,6 +849,7 @@ void ld_e_l(struct gameboy * gameboy)
 void ld_e_hlp(struct gameboy * gameboy)
 {
 	printf("ld_e_hlp\n");
+	gameboy->cpu.e = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_e_a(struct gameboy * gameboy)
@@ -902,6 +899,7 @@ void ld_h_l(struct gameboy * gameboy)
 void ld_h_hlp(struct gameboy * gameboy)
 {
 	printf("ld_h_hlp\n");
+	gameboy->cpu.h = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_h_a(struct gameboy * gameboy)
@@ -949,6 +947,7 @@ void ld_l_l(struct gameboy * gameboy)
 void ld_l_hlp(struct gameboy * gameboy)
 {
 	printf("ld_l_hlp\n");
+	gameboy->cpu.l = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_l_a(struct gameboy * gameboy)
@@ -962,31 +961,37 @@ void ld_l_a(struct gameboy * gameboy)
 void ld_hlp_b(struct gameboy * gameboy)
 {
 	printf("ld_hlp_b\n");
+	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.b);
 }
 
 void ld_hlp_c(struct gameboy * gameboy)
 {
 	printf("ld_hlp_c\n");
+	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.c);
 }
 
 void ld_hlp_d(struct gameboy * gameboy)
 {
 	printf("ld_hlp_d\n");
+	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.d);
 }
 
 void ld_hlp_e(struct gameboy * gameboy)
 {
 	printf("ld_hlp_e\n");
+	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.e);
 }
 
 void ld_hlp_h(struct gameboy * gameboy)
 {
 	printf("ld_hlp_h\n");
+	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.h);
 }
 
 void ld_hlp_l(struct gameboy * gameboy)
 {
 	printf("ld_hlp_l\n");
+	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.l);
 }
 
 void halt(struct gameboy * gameboy)
@@ -997,6 +1002,7 @@ void halt(struct gameboy * gameboy)
 void ld_hlp_a(struct gameboy * gameboy)
 {
 	printf("ld_hlp_a\n");
+	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.a);
 }
 
 void ld_a_b(struct gameboy * gameboy)
@@ -1038,6 +1044,7 @@ void ld_a_l(struct gameboy * gameboy)
 void ld_a_hlp(struct gameboy * gameboy)
 {
 	printf("ld_a_hlp\n");
+	gameboy->cpu.a = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_a_a(struct gameboy * gameboy)
@@ -1392,6 +1399,7 @@ void ret_nz(struct gameboy * gameboy)
 void pop_bc(struct gameboy * gameboy)
 {
 	printf("pop_bc\n");
+	gameboy->cpu.bc = popWordFromStack(gameboy);
 }
 
 void jp_nz(struct gameboy * gameboy)
@@ -1476,6 +1484,8 @@ void ret_nc(struct gameboy * gameboy)
 void pop_de(struct gameboy * gameboy)
 {
 	printf("pop_de\n");
+	//pop top value from stack into register DE
+	gameboy->cpu.de = popWordFromStack(gameboy);
 }
 
 void jp_nc(struct gameboy * gameboy)
@@ -1491,6 +1501,7 @@ void call_nc_nn(struct gameboy * gameboy)
 void push_de(struct gameboy * gameboy)
 {
 	printf("push_de\n");
+	pushWordToStack(gameboy, gameboy->cpu.de);
 }
 
 void sub_a_n(struct gameboy * gameboy)
@@ -1582,9 +1593,11 @@ void jp_hlp(struct gameboy * gameboy)
 	printf("jp_hlp\n");
 }
 
-void ld_nn_a(struct gameboy * gameboy)
+void ld_nnp_a(struct gameboy * gameboy, uint16_t nnp)
 {
-	printf("ld_nn_a\n");
+	printf("ld_nnp_a\n");
+	//load value in a to address nnp
+	writeByte(gameboy, nnp, gameboy->cpu.a);	
 }
 
 void xor_n(struct gameboy * gameboy)
@@ -1644,9 +1657,11 @@ void ld_sp_hl(struct gameboy * gameboy)
 	gameboy->cpu.sp = gameboy->cpu.hl;
 }
 
-void ld_a_nnp(struct gameboy * gameboy)
+void ld_a_nnp(struct gameboy * gameboy, uint16_t nnp)
 {
-	printf("ld_a_nn\n");
+	printf("ld_a_nnp\n");
+	//read data as address
+	gameboy->cpu.a = readByte(gameboy, nnp);
 }
 
 void ei(struct gameboy * gameboy)
@@ -1668,4 +1683,5 @@ void rst_38(struct gameboy * gameboy)
 void undefined(struct gameboy * gameboy)
 {
 	printf("undefined\n");
+	gameboy->cpu.pc--;
 }

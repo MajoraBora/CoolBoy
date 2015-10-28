@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include "gameboy.h"
 
+/*
+Flags are contained in the F upper 4 bits of the F register
+*/
+
 enum flag {
 	ZERO = 7,
 	SUB = 6,

@@ -30,6 +30,9 @@ Represent 1 byte as an unsigned char
 
 */
 
+//4194304Hz
+#define CLOCKSPEED 4194304
+
 #define NO_OF_INSTRUCTIONS 256
 
 /*
@@ -107,7 +110,7 @@ uint8_t executeNextOpcode(struct gameboy * gameboy);
 // 0x00 - 0x0F
 void nop(struct gameboy * gameboy); //0
 void ld_bc_nn(struct gameboy * gameboy, uint16_t nn); //1
-void ld_bc_a(struct gameboy * gameboy); //2
+void ld_bcp_a(struct gameboy * gameboy); //2
 void inc_bc(struct gameboy * gameboy); //3
 void inc_b(struct gameboy * gameboy); //4
 void dec_b(struct gameboy * gameboy); //5
@@ -163,7 +166,7 @@ void ldd_hlp_a(struct gameboy * gameboy);
 void inc_sp(struct gameboy * gameboy);
 void inc_hl(struct gameboy * gameboy);
 void dec_hl(struct gameboy * gameboy);
-void ld_hlp_n(struct gameboy * gameboy);
+void ld_hlp_n(struct gameboy * gameboy, uint8_t data);
 void scf(struct gameboy * gameboy);
 void jr_c(struct gameboy * gameboy);
 void add_hl_sp(struct gameboy * gameboy);
@@ -361,7 +364,7 @@ void and_n(struct gameboy * gameboy);
 void rest_20(struct gameboy * gameboy);
 void add_sp_d(struct gameboy * gameboy);
 void jp_hlp(struct gameboy * gameboy);
-void ld_nn_a(struct gameboy * gameboy);
+void ld_nnp_a(struct gameboy * gameboy, uint16_t nnp);
 void xor_n(struct gameboy * gameboy);
 void rst_28(struct gameboy * gameboy);
  
@@ -374,7 +377,7 @@ void or_n(struct gameboy * gameboy);
 void rest_30(struct gameboy * gameboy);
 void ldhl_sp_d(struct gameboy * gameboy);
 void ld_sp_hl(struct gameboy * gameboy);
-void ld_a_nnp(struct gameboy * gameboy);
+void ld_a_nnp(struct gameboy * gameboy, uint16_t nnp);
 void ei(struct gameboy * gameboy);
 void cp_n(struct gameboy * gameboy);
 void rst_38(struct gameboy * gameboy);

@@ -37,6 +37,7 @@ void startEmulationLoop(struct gameboy * gameboy)
 	//	printf("%d\n", cycles);
 	//}
 	//increment things
+	executeNextOpcode(gameboy);
 }
 
 void reset(struct gameboy * gameboy)
