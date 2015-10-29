@@ -6,6 +6,7 @@
 #include "memory.h"
 #include "gameboy.h"
 #include "cartridge.h"
+#include "timer.h"
 
 int main(void)
 {
@@ -13,7 +14,7 @@ int main(void)
 	struct gameboy * gameboy;
 	gameboy = createGameboy();
 
-	loadGame(gameboy, "sml.gb");
+	loadGame(gameboy, "tetris.gb");
 
 	startEmulationLoop(gameboy);
 	

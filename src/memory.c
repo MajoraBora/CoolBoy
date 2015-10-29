@@ -29,6 +29,19 @@ void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data)
 	else if ((address >= RESTRICTED_START) && (address < RESTRICTED_END)){
 		fprintf(stderr, "WriteMemory: address %x is within restricted memory %x - %x\n", address, RESTRICTED_START, RESTRICTED_END);
 	}
+	else if (address == TMC){
+		//the game is trying to change the timer controller
+		int currentFreq = getTimerFrequency(gameboy);
+		gameboy->memory.mem[TMC] = data;
+		int newFreq = getTimerFrequency(gameboy);
+		if (newFreq != currentFreq){
+			initialiseTimerCounter(gameboy);
+		}
+	}
+	else if (address == DIV_REG){
+		//any writes to the divider register resets it to 0
+		gameboy->memory.mem[DIV_REG] = 0;
+	}
 	else {
 		gameboy->memory.mem[address] = data;
 	}
