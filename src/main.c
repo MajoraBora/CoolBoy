@@ -7,6 +7,7 @@
 #include "gameboy.h"
 #include "cartridge.h"
 #include "timer.h"
+#include "bitUtils.h"
 
 int main(void)
 {
@@ -21,5 +22,7 @@ int main(void)
 	destroyGameboy(gameboy);
 
 	return 0;
+
+
 }
 

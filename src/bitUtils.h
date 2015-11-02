@@ -5,5 +5,6 @@
 #include <stdbool.h>
 
 bool isBitSet(uint8_t data, uint8_t byte);
+void setBit(uint8_t * data, uint8_t byte, bool state);
 
 #endif
