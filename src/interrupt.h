@@ -20,20 +20,6 @@ enum interrupt {
 	joypad
 };
 
-struct interruptstruct {
-	const char * name;
-	void * function;
-	uint8_t bit;
-};
-
-const struct interruptstruct interrupts[NO_OF_INTERRUPTS] = {
-	{"V-Blank", vblankInterrupt, 0},
-	{"LCD", lcdInterrupt, 1},
-	{"Timer", timerInterrupt, 2},
-	{"Serial", serialInterrupt, 3},
-	{"Joypad", joypadInterrupt, 4}
-};
-
 struct interrupts {
 	bool masterEnable;
 	uint8_t intEnable;

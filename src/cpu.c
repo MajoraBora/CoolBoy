@@ -1,6 +1,7 @@
 #include "cpu.h"
 #include "gameboy.h"
 #include "stack.h"
+#include "interrupt.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -1628,6 +1629,7 @@ void pop_af(struct gameboy * gameboy)
 void di(struct gameboy * gameboy)
 {
 	printf("di\n");
+	setInterruptMasterFlag(gameboy, false);
 }
 
 void push_af(struct gameboy * gameboy)
@@ -1667,6 +1669,8 @@ void ld_a_nnp(struct gameboy * gameboy, uint16_t nnp)
 void ei(struct gameboy * gameboy)
 {
 	printf("ei\n");
+	//enable interrupt
+	setInterruptMasterFlag(gameboy, true);
 }
 
 void cp_n(struct gameboy * gameboy)

@@ -1,16 +1,17 @@
 #include "interrupt.h"
 #include "gameboy.h"
 #include "bitUtils.h"
+#include <stdio.h>
 
-const struct interruptstruct interrupts[NO_OF_INTERRUPTS] = {
-        {"V-Blank", vblankInterrupt, 0},
-        {"LCD", lcdInterrupt, 1},
-        {"Timer", timerInterrupt, 2},
-        {"Serial", serialInterrupt, 3},
-        {"Joypad", joypadInterrupt, 4}
+const uint8_t interruptRoutineAddresses[NO_OF_INTERRUPTS] = {
+	0x40, //vblank
+	0x48, //lcd
+	0x50, //timer
+	0x58, //serial
+	0x60 //joypad
 };
 
-static void setInterruptRequest(struct gameboy * gameboy, enum interrupt interrupt);
+static void doInterrupt(struct gameboy * gameboy, int i);
 
 void requestInterrupt(struct gameboy * gameboy, enum interrupt interrupt)
 {
@@ -18,12 +19,10 @@ void requestInterrupt(struct gameboy * gameboy, enum interrupt interrupt)
 	//sets the corresponding bit in the Interrupt Request Register(0xFF0F)
 	//stored at gameboy->interrupts...
 
-	setInterruptRequest(gameboy, interrupt);
-}
-
-static void setInterruptRequest(struct gameboy * gameboy, enum interrupt interrupt)
-{
+	printf("Requesting interrupt %d\n", interrupt);
+	printf("%d\n", gameboy->interrupts.intRequest);
 	setBit(&gameboy->interrupts.intRequest, interrupt, true);
+	printf("%d\n", gameboy->interrupts.intRequest);
 }
 
 void setInterruptMasterFlag(struct gameboy * gameboy, bool state)
@@ -40,11 +39,21 @@ void serviceInterrupts(struct gameboy * gameboy)
 	if (gameboy->interrupts.masterEnable){
 		uint8_t enabledRequests = gameboy->interrupts.intRequest & gameboy->interrupts.intEnable;
 		//If the bit is set, do the interrupt
-		for (int i = vblank; i < joypad; i++){
+		for (int i = vblank; i <= joypad; i++){
+			printf("%d: %d\n", i, enabledRequests);
 			if (isBitSet(enabledRequests, i)){
 				//interruptFunctions[i]; //execute correct function
+				printf("doing interrupt %d\n", i);
+				doInterrupt(gameboy, i);
 			}
 		}
 	}
+}
+
+static void doInterrupt(struct gameboy * gameboy, int i)
+{
+	gameboy->interrupts.masterEnable = false;
+	setBit(&gameboy->interrupts.intRequest, i, false); // reset bit
+	gameboy->cpu.pc = interruptRoutineAddresses[i]; 
 }
 

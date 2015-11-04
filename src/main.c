@@ -9,6 +9,8 @@
 #include "timer.h"
 #include "bitUtils.h"
 
+#include "interrupt.h"
+
 int main(void)
 {
 	
@@ -18,6 +20,9 @@ int main(void)
 	loadGame(gameboy, "tetris.gb");
 
 	startEmulationLoop(gameboy);
+
+	requestInterrupt(gameboy, serial);
+	serviceInterrupts(gameboy);
 	
 	destroyGameboy(gameboy);
 
