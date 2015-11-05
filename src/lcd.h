@@ -2,6 +2,7 @@
 #define LCD_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /*
 The gameboy draws each scanline from 0 to 153. 
@@ -44,10 +45,59 @@ struct screen {
 	uint8_t scrollY;
 	uint8_t scrollX;
 	uint8_t currentScanline; //writing resets the counter
+	//redirect read from 0xFF44 to currentScanline
 	uint8_t windowXPos;
 	uint8_t windowYPos;
 };
 
+enum controlBit {
+	bgDisplay,
+	objDisplayEnable,
+	objSize,
+	bgTileDisplaySelect,
+	bgWindowTileDataSelect,
+	windowDisplayEnable,
+	windowTileMapDisplaySelect,
+	lcdEnable
+};
+
+enum statusBitMode {
+	hBlank,
+	vBlank,
+	oamRead,
+	oamVramRead
+};
+
+bool isLCDEnabled(struct gameboy * gameboy);
+
+/*
+The memory address at 0xFF41 holds the current status of the LCD. The LCD goes through
+4 different modes: vBlank period, hBlank period, searching for sprite attributes, and 
+transferring data to LCD driver. 
+
+Bit 1 and 0 of the lcd status value contains the current LCD mode.
+
+When the LCD status changes its mode to either mode 0, 1 or 2, an interrupt request
+occurs. Bits 3, 4, and 5 of the status register are interrupt enabled flags, like the 
+one at 0xFFFF for the other interrupts.
+Bit 3 - Mode 0 enabled (hblank)
+bit 4 - Mode 1 enabled (vblank)
+bit 5 - Mode 2 enabled (oam read)
+
+When the mode changes to 0, 1 or 2, and if the the corresponding bit at 3, 4 or 5 is 
+set, then an LCD interrupt is requested.
+
+When the LCD is disabled, its mode must be set to 1
+
+Bit 2 of the status register is set to 1 if register 0xFF44 is the same value as
+0xFF45. Otherwise, it is set to 0. Bit 6 of the status register is the like the 
+previous "enabled" flags, only for bit 2. In other words, if the coincidence flag is
+set, then the current scanline (0xFF44) is the same as a scanline the game is 
+interested in (0xFF45). This is usually used to do special effects on the display.
+
+If they are the same values, then an interrupt is requested
+*/
+void setLCDStatus(struct gameboy * gameboy, enum statusBit);
 void updateGraphics(struct gameboy * gameboy, int cycles);
 
 #endif
