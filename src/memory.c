@@ -1,5 +1,6 @@
 #include "memory.h"
 #include "gameboy.h"
+#include "dma.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -41,6 +42,9 @@ void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data)
 	else if (address == DIV_REG){
 		//any writes to the divider register resets it to 0
 		gameboy->memory.mem[DIV_REG] = 0;
+	}
+	else if (address == DMA_ADDRESS){
+		doDMATransfer(gameboy, data);
 	}
 	else {
 		gameboy->memory.mem[address] = data;
