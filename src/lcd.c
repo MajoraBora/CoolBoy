@@ -21,11 +21,28 @@ static void handleTransferToLCDDriver(struct gameboy * gameboy);
 static void requestAnyNewModeInterrupts(struct gameboy * gameboy, uint8_t previousMode);
 static void doCoincidenceFlag(struct gameboy * gameboy);
 
+static bool backgroundTilesEnabled(struct gameboy * gameboy);
+static bool spritesEnabled(struct gameboy * gameboy);
+
+static void renderTiles(struct gameboy * gameboy);
+static void renderSprites(struct gameboy * gameboy);
+static bool windowEnabled(struct gameboy * gameboy);
+static void renderTilesOnWindow(struct gameboy * gameboy);
+static void renderTilesOnBackground(struct gameboy * gameboy);
+static void (*getTileDataGetFunction(struct gameboy * gameboy))(struct gameboy * gameboy);
+static void getTileDataFromRegion1(struct gameboy * gameboy);
+static void getTileDataFromRegion2(struct gameboy * gameboy);
+
 const void (*scanModeFuncs[4]) = {
 	handleHBlank,
 	handleVBlank,
 	handleSpriteSearch,
 	handleTransferToLCDDriver
+};
+
+const void (*tileDataFuncs[2]) = {
+	getTileDataFromRegion1,
+	getTileDataFromRegion2
 };
 
 void updateGraphics(struct gameboy * gameboy, int cycles)
@@ -130,7 +147,92 @@ void setLCDStatus(struct gameboy * gameboy)
 
 void drawScanline(struct gameboy * gameboy)
 {
+	if (backgroundTilesEnabled(gameboy)){
+		renderTiles(gameboy);
+	}
+	
+	if (spritesEnabled(gameboy)){
+		renderSprites(gameboy);
+	}
+}
 
+static bool backgroundTilesEnabled(struct gameboy * gameboy)
+{
+	return isBitSet(gameboy->screen.control, bgDisplayEnable);
+}
+
+static bool spritesEnabled(struct gameboy * gameboy)
+{
+	return isBitSet(gameboy->screen.control, spriteEnable);
+}
+
+static void renderTiles(struct gameboy * gameboy)
+{
+	getTileDataGetFunction(gameboy);
+	if(windowEnabled(gameboy)){
+		if (gameboy->screen.windowYPos <= gameboy->screen.currentScanline){
+			renderTilesOnWindow(gameboy);
+		}
+		else {
+			renderTilesOnBackground(gameboy);
+		}
+	}
+}
+
+static void renderTilesOnWindow(struct gameboy * gameboy)
+{
+	uint16_t windowMemory = 0;
+	if (isBitSet(gameboy->screen.control, windowTileMapDisplaySelect)){
+		windowMemory = REGION_TWO_BG_MEMORY;
+	}
+	else {
+		windowMemory = REGION_ONE_BG_MEMORY;
+	}
+	printf("%d\n", windowMemory);
+}
+
+static void renderTilesOnBackground(struct gameboy * gameboy)
+{
+	uint16_t backgroundMemory = 0;
+	if (isBitSet(gameboy->screen.control, bgTileDisplaySelect)){
+		backgroundMemory = REGION_TWO_BG_MEMORY;
+	}
+	else {
+		backgroundMemory = REGION_ONE_BG_MEMORY;
+	}
+	printf("%d\n", backgroundMemory);
+
+}
+
+void (*getTileDataGetFunction(struct gameboy * gameboy))(struct gameboy * gameboy)
+{
+	int index = (int)isBitSet(gameboy->screen.control, bgWindowTileDataSelect);
+	return tileDataFuncs[index];
+}
+
+static void getTileDataFromRegion1(struct gameboy * gameboy)
+{
+	//index 0 in func array
+	//8800
+	//if isBitSet false
+}
+
+static void getTileDataFromRegion2(struct gameboy * gameboy)
+{
+	//index 1
+	//8000
+	//if isBitSet true
+	
+}
+
+static void renderSprites(struct gameboy * gameboy)
+{
+
+}
+
+static bool windowEnabled(struct gameboy * gameboy)
+{
+	return isBitSet(gameboy->screen.control, windowDisplayEnable) ? true : false;
 }
 
 static uint8_t getCurrentMode(struct gameboy * gameboy)
