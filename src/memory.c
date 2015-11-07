@@ -167,9 +167,12 @@ uint8_t readByte(struct gameboy * gameboy, uint16_t address)
 		//the ram bank array is 0x8000 kb in size.
 		return gameboy->cartridge.ramBanks[(address - RAM_BANK_START) + (gameboy->cartridge.currentRAMBank * RAM_BANK_SIZE)];
 	}
-	else {
-		return gameboy->memory.mem[address];
+	else if (address == CURRENT_SCANLINE){
+		//any reads from currentscanline reset it
+		gameboy->screen.currentScanline = 0;
 	}
+
+	return gameboy->memory.mem[address];
 
 }
 

@@ -14,6 +14,8 @@ with a counter, similar to how the timers work.
 #define X 160
 #define Y 144
 
+#define NO_OF_INVISIBLE_SCANLINES 9
+
 #define CONTROL_REG 0xFF40
 #define STATUS_REG 0xFF41
 #define SCROLL_X 0xFF42
@@ -37,6 +39,8 @@ with a counter, similar to how the timers work.
 #define OBJECT_PALETTE_0_DATA 0xFF48
 #define OBJECT_PALETTE_1_DATA 0xFF49
 
+#define SCANLINE_CYCLE_TIME 456
+
 struct gameboy;
 
 struct screen {
@@ -45,6 +49,7 @@ struct screen {
 	uint8_t scrollY;
 	uint8_t scrollX;
 	uint8_t currentScanline; //writing resets the counter
+	int scanlineCounter;
 	//redirect read from 0xFF44 to currentScanline
 	uint8_t windowXPos;
 	uint8_t windowYPos;
@@ -67,8 +72,6 @@ enum statusBitMode {
 	oamRead,
 	oamVramRead
 };
-
-bool isLCDEnabled(struct gameboy * gameboy);
 
 /*
 The memory address at 0xFF41 holds the current status of the LCD. The LCD goes through
@@ -97,7 +100,8 @@ interested in (0xFF45). This is usually used to do special effects on the displa
 
 If they are the same values, then an interrupt is requested
 */
-void setLCDStatus(struct gameboy * gameboy, enum statusBit);
+void setLCDStatus(struct gameboy * gameboy);
+bool isLCDEnabled(struct gameboy * gameboy);
 void updateGraphics(struct gameboy * gameboy, int cycles);
-
+void drawScanline(struct gameboy * gameboy);
 #endif
