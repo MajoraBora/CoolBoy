@@ -21,9 +21,6 @@ int main(void)
 
 	startEmulationLoop(gameboy);
 
-	requestInterrupt(gameboy, serial);
-	serviceInterrupts(gameboy);
-	
 	destroyGameboy(gameboy);
 
 	return 0;

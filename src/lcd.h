@@ -41,6 +41,16 @@ with a counter, similar to how the timers work.
 
 #define SCANLINE_CYCLE_TIME 456
 
+#define SPRITE_ATTR_CYCLE_LOWER 0
+#define SPRITE_ATTR_CYCLE_UPPER 80
+#define DRIVER_TRANSFER_CYCLE_LOWER 80
+#define DRIVER_TRANSFER_CYCLE_UPPER 252
+
+#define HBLANK_ENABLE_BIT 3
+#define VBLANK_ENABLE_BIT 4
+#define SPRITE_ENABLE_BIT 5
+#define COINCIDENCE_BIT 2
+#define COINCIDENCE_ENABLE_BIT 6
 struct gameboy;
 
 struct screen {
@@ -53,6 +63,7 @@ struct screen {
 	//redirect read from 0xFF44 to currentScanline
 	uint8_t windowXPos;
 	uint8_t windowYPos;
+	bool currentLCDInterruptEnabled;
 };
 
 enum controlBit {
