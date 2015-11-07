@@ -1,7 +1,4 @@
 # CoolBoy
 A GameBoy emulator written in C. Work in progress.
 
-TODO:
-	Create structures for GameBoy, CPU, memory, graphics etc.
-	Implement CPU instruction functions
-	
+Need to implement graphics, some CPU functions, controls and sound. A debugger will probably be developed during tests. Compiles with no warnings.
