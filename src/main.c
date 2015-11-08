@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "cpu.h"
-#include "registers.h"
-#include "memory.h"
-#include "gameboy.h"
-#include "cartridge.h"
-#include "timer.h"
-#include "bitUtils.h"
+#include "../include/cpu.h"
+#include "../include/registers.h"
+#include "../include/memory.h"
+#include "../include/gameboy.h"
+#include "../include/cartridge.h"
+#include "../include/timer.h"
+#include "../include/bitUtils.h"
 
-#include "interrupt.h"
+#include "../include/interrupt.h"
 
 int main(void)
 {
@@ -17,7 +17,7 @@ int main(void)
 	struct gameboy * gameboy;
 	gameboy = createGameboy();
 
-	loadGame(gameboy, "tetris.gb");
+	loadGame(gameboy, "../games/tetris.gb");
 
 	startEmulationLoop(gameboy);
 

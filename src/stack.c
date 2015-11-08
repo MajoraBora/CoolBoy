@@ -1,4 +1,4 @@
-#include "stack.h"
+#include "../include/stack.h"
 #include <stdio.h>
 
 void pushWordToStack(struct gameboy * gameboy, uint16_t word)

@@ -1,6 +1,6 @@
-#include "timer.h"
-#include "gameboy.h"
-#include "bitUtils.h"
+#include "../include/timer.h"
+#include "../include/gameboy.h"
+#include "../include/bitUtils.h"
 
 const int frequencies[4] = {
 	4096,

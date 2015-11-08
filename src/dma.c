@@ -1,5 +1,5 @@
-#include "dma.h"
-#include "gameboy.h"
+#include "../include/dma.h"
+#include "../include/gameboy.h"
 
 void doDMATransfer(struct gameboy * gameboy, uint8_t data)
 {

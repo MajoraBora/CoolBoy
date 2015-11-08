@@ -1,6 +1,6 @@
-#include "cartridge.h"
-#include "gameboy.h"
-#include "mbc.h"
+#include "../include/cartridge.h"
+#include "../include/gameboy.h"
+#include "../include/mbc.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>

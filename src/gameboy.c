@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "gameboy.h"
-#include "registers.h"
+#include "../include/gameboy.h"
+#include "../include/registers.h"
 
 static void initialiseCPU(struct gameboy * gameboy);
 static void initialiseMemory(struct gameboy * gameboy);

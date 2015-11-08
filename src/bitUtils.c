@@ -1,4 +1,4 @@
-#include "bitUtils.h"
+#include "../include/bitUtils.h"
 
 bool isBitSet(uint8_t data, uint8_t bit)
 {

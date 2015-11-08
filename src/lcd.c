@@ -1,7 +1,7 @@
-#include "lcd.h"
-#include "bitUtils.h"
-#include "gameboy.h"
-#include "memory.h"
+#include "../include/lcd.h"
+#include "../include/bitUtils.h"
+#include "../include/gameboy.h"
+#include "../include/memory.h"
 #include <stdio.h>
 
 static void doScanline(struct gameboy * gameboy);

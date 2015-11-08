@@ -1,6 +1,6 @@
-#include "interrupt.h"
-#include "gameboy.h"
-#include "bitUtils.h"
+#include "../include/interrupt.h"
+#include "../include/gameboy.h"
+#include "../include/bitUtils.h"
 #include <stdio.h>
 
 const uint8_t interruptRoutineAddresses[NO_OF_INTERRUPTS] = {

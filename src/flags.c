@@ -1,5 +1,5 @@
-#include "flags.h"
-#include "bitUtils.h"
+#include "../include/flags.h"
+#include "../include/bitUtils.h"
 
 bool isFlagSet(struct gameboy * gameboy, enum flag flag)
 {

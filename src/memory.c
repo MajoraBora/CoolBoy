@@ -1,6 +1,6 @@
-#include "memory.h"
-#include "gameboy.h"
-#include "dma.h"
+#include "../include/memory.h"
+#include "../include/gameboy.h"
+#include "../include/dma.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>

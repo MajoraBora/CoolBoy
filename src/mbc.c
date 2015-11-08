@@ -1,5 +1,5 @@
-#include "mbc.h"
-#include "gameboy.h"
+#include "../include/mbc.h"
+#include "../include/gameboy.h"
 #include <string.h>
 #include <stdio.h>
 

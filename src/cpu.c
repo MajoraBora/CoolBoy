@@ -1,7 +1,7 @@
-#include "cpu.h"
-#include "gameboy.h"
-#include "stack.h"
-#include "interrupt.h"
+#include "../include/cpu.h"
+#include "../include/gameboy.h"
+#include "../include/stack.h"
+#include "../include/interrupt.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
