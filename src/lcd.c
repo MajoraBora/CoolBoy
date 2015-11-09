@@ -29,9 +29,8 @@ static void renderSprites(struct gameboy * gameboy);
 static bool windowEnabled(struct gameboy * gameboy);
 static void renderTilesOnWindow(struct gameboy * gameboy);
 static void renderTilesOnBackground(struct gameboy * gameboy);
-static void (*getTileDataGetFunction(struct gameboy * gameboy))(struct gameboy * gameboy);
-static void getTileDataFromRegion1(struct gameboy * gameboy);
-static void getTileDataFromRegion2(struct gameboy * gameboy);
+
+static struct colour getColour(struct gameboy * gameboy, uint8_t colourNum, uint16_t colourAddress);
 
 const void (*scanModeFuncs[4]) = {
 	handleHBlank,
@@ -40,10 +39,15 @@ const void (*scanModeFuncs[4]) = {
 	handleTransferToLCDDriver
 };
 
-const void (*tileDataFuncs[2]) = {
-	getTileDataFromRegion1,
-	getTileDataFromRegion2
+//move this
+struct colour palette[4] = {
+	{255, 255, 255}, //white
+	{0xCC, 0xCC, 0xCC}, //light grey
+	{0x77, 0x77, 0x77}, //dark grey
+	{0, 0, 0} //black
 };
+
+struct colour frameBuffer[X * Y];
 
 void updateGraphics(struct gameboy * gameboy, int cycles)
 {
@@ -168,66 +172,212 @@ static bool spritesEnabled(struct gameboy * gameboy)
 
 static void renderTiles(struct gameboy * gameboy)
 {
-	getTileDataGetFunction(gameboy);
-	if(windowEnabled(gameboy)){
+	//forgive me father for I have sinned
+	//this and renderSprites copied from codeslinger tut, needs major refactor
+	//I'm just desperate to get something on screen at this point
+	uint16_t tileData = 0;
+	uint16_t backgroundMemory = 0;
+	bool unsig = true;
+	bool usingWindow = false;
+	
+	if (windowEnabled(gameboy)){
 		if (gameboy->screen.windowYPos <= gameboy->screen.currentScanline){
-			renderTilesOnWindow(gameboy);
-		}
-		else {
-			renderTilesOnBackground(gameboy);
+			usingWindow = true;
 		}
 	}
+
+	//which tile data are we using?
+	if (isBitSet(gameboy->screen.control, 4)){
+		tileData = 0x8000;
+	}
+	else {
+		//signed
+		tileData = 0x8800;
+		unsig = false;
+	}
+
+	//which background memory?
+	if (!usingWindow){
+		if (isBitSet(gameboy->screen.control, 3)){
+			backgroundMemory = 0x9C00;
+		}
+		else {
+			backgroundMemory = 0x9800;
+		}
+	}
+	else {
+		//which window memory?
+		if (isBitSet(gameboy->screen.control, 6)){
+			backgroundMemory = 0x9C00;
+		}
+		else {
+			backgroundMemory = 0x9800;
+		}
+	}
+
+	uint8_t yPos = 0; //used to calculate which of the 32 vertical tiles is being drawn
+	if (!usingWindow){
+		yPos = gameboy->screen.scrollY + gameboy->screen.currentScanline;
+	}
+	else {
+		yPos = gameboy->screen.currentScanline - gameboy->screen.scrollY;
+	}
+
+	//which of the 8 vertical pixels of the current tile is the scanline on?
+	uint16_t tileRow = (yPos / 8) * 32;
+	
+	//draw 160 horizontal pixels for this scanline
+	for (int pixel = 0; pixel < X; pixel++){
+		uint8_t xPos = pixel + gameboy->screen.scrollX;
+		if (usingWindow && (pixel >= gameboy->screen.windowXPos - 7)){
+			xPos = pixel - (gameboy->screen.windowXPos - 7);
+		}
+		
+		//which of the 32 horiz. tiles does this xPos fall within?
+		uint16_t tileCol = xPos / 8;
+		int16_t tileNum;
+
+		//get tileID
+		uint16_t tileAddress = backgroundMemory + tileRow + tileCol;
+		if (unsig){
+			tileNum = readByte(gameboy, tileAddress);
+		}
+		else {
+			tileNum = (int16_t)readByte(gameboy, tileAddress);
+		}
+
+		//find where this tileID is in memory.
+		uint16_t tileLocation = tileData;
+		if (unsig){
+			tileLocation += (tileNum * 16);
+		}
+		else {
+			tileLocation += ((tileNum + 128) * 16);
+		}
+
+		//find current vertical line on the tile we're on to get tile data
+		//from memory
+		uint8_t line = yPos % 8;
+		line *= 2; //each vertical line takes up 2 bytes
+		uint8_t data1 = readByte(gameboy, tileLocation + line);
+		uint8_t data2 = readByte(gameboy, tileLocation + line + 1);
+	
+		//pixel 0 in the tile is bit 7 of data1 and 2
+		//pixel 1 is 6 etc.
+
+		int colourBit = xPos % 8;
+		colourBit -= 7;
+		colourBit *= -1;
+
+		//combine data 2 and 1 to get the colour ID for this pixel
+		int colourNum = getBit(data2, colourBit);
+		colourNum <<= 1;
+		colourNum |= getBit(data1, colourBit);
+
+		//now we have the colour ID, get the actual colour from 0xFF47
+		struct colour colour = getColour(gameboy, colourNum, 0xFF47);
+
+		frameBuffer[(pixel * X) + gameboy->screen.currentScanline] = colour;
+	}
+	
+}
+
+static struct colour getColour(struct gameboy * gameboy, uint8_t colourNum, uint16_t colourAddress)
+{
+	uint8_t pal = readByte(gameboy, colourAddress);
+	int hi = 0;
+	int lo = 0;
+
+	switch(colourNum){
+		case 0: hi = 1; lo = 0;
+		break;
+		case 1: hi = 3; lo = 2;
+		break;
+		case 2: hi = 5; lo = 4;
+		break;
+		case 3: hi = 7; lo = 6;
+	}
+
+	int colour = 0;
+	colour = getBit(pal, hi) << 1;
+	colour |= getBit(pal, lo);
+
+	return palette[colour];
 }
 
 static void renderTilesOnWindow(struct gameboy * gameboy)
 {
-	uint16_t windowMemory = 0;
-	if (isBitSet(gameboy->screen.control, windowTileMapDisplaySelect)){
-		windowMemory = REGION_TWO_BG_MEMORY;
-	}
-	else {
-		windowMemory = REGION_ONE_BG_MEMORY;
-	}
-	printf("%d\n", windowMemory);
 }
 
 static void renderTilesOnBackground(struct gameboy * gameboy)
 {
-	uint16_t backgroundMemory = 0;
-	if (isBitSet(gameboy->screen.control, bgTileDisplaySelect)){
-		backgroundMemory = REGION_TWO_BG_MEMORY;
-	}
-	else {
-		backgroundMemory = REGION_ONE_BG_MEMORY;
-	}
-	printf("%d\n", backgroundMemory);
 
-}
-
-void (*getTileDataGetFunction(struct gameboy * gameboy))(struct gameboy * gameboy)
-{
-	int index = (int)isBitSet(gameboy->screen.control, bgWindowTileDataSelect);
-	return tileDataFuncs[index];
-}
-
-static void getTileDataFromRegion1(struct gameboy * gameboy)
-{
-	//index 0 in func array
-	//8800
-	//if isBitSet false
-}
-
-static void getTileDataFromRegion2(struct gameboy * gameboy)
-{
-	//index 1
-	//8000
-	//if isBitSet true
-	
 }
 
 static void renderSprites(struct gameboy * gameboy)
 {
+	bool use8x16 = isBitSet(gameboy->screen.control, 2);
+	for (int sprite = 0; sprite < 40; sprite++){
+		//there are 40 sprites, loop through all of them
+		uint8_t index = sprite * 4; //each sprite occupies 4 bytes in attr table
+		//just type now, ask questions later
+		uint8_t yPos = readByte(gameboy, 0xFE00 + index) - 16;
+		uint8_t xPos = readByte(gameboy, 0xFE00 + index + 1) - 8;
+		uint8_t tileLocation = readByte(gameboy, 0xFE00 + index + 2);
+		uint8_t attributes = readByte(gameboy, 0xFE00 + index + 3);
 
+		bool yFlip = isBitSet(attributes, 6);
+		bool xFlip = isBitSet(attributes, 5);
+
+		int scanline = gameboy->screen.currentScanline;
+	
+		int ySize = 8;
+		if (use8x16){
+			ySize = 16;
+		}
+
+		//does this sprite intercept with the scanline?
+		if ((scanline >= yPos) && (scanline < (yPos + ySize))){
+			int line = scanline - yPos;
+
+			//read the sprite in backwards in the y axis
+			if (yFlip){
+				line -= ySize;
+				line *= -1;
+			}
+
+			line *= 2; //same as for tiles
+			uint16_t dataAddress = (0x8000 + (tileLocation * 16)) + line;
+			uint8_t data1 = readByte(gameboy, dataAddress);
+			uint8_t data2 = readByte(gameboy, dataAddress + 1);
+	
+			//easier to read in from right to left as pixel 0 is bit 7 
+			//in colour data, pixel 1 is bit 6 etc...
+
+			for (int tilePixel = 7; tilePixel >= 0; tilePixel--){
+				int colourBit = tilePixel;
+				if (xFlip){
+					colourBit -= 7;
+					colourBit *= -1;
+				}
+				//the rest is the same for tiles
+				int colourNum = getBit(data2, colourBit);
+				colourNum <<= 1;
+				colourNum |= getBit(data1, colourBit);
+				
+				uint16_t colourAddress = isBitSet(attributes, 4) ? 0xFF49 : 0xFF48;
+				struct colour colour = getColour(gameboy, colourNum, colourAddress);
+
+				int xPix = 0 - tilePixel;
+				xPix += 7;
+				int pixel = xPos + xPix;
+				
+				int pixelOffset = (scanline * X) + pixel; 
+				frameBuffer[pixelOffset] = colour;
+			}
+		}
+	}
+				
 }
 
 static bool windowEnabled(struct gameboy * gameboy)

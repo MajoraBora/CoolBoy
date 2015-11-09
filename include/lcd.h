@@ -147,6 +147,12 @@ enum statusBitMode {
 	oamVramRead
 };
 
+struct colour {
+	uint8_t red;
+	uint8_t green;
+	uint8_t blue;
+};
+
 /*
 The memory address at 0xFF41 holds the current status of the LCD. The LCD goes through
 4 different modes: vBlank period, hBlank period, searching for sprite attributes, and 

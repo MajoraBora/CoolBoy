@@ -15,3 +15,8 @@ void setBit(uint8_t * data, uint8_t bit, bool state)
 	}
 }
 
+uint8_t getBit(int data, int position)
+{
+	uint8_t mask = 1 << position;
+	return (data & mask) ? 1 : 0;
+}
