@@ -2,6 +2,7 @@
 #include "../include/gameboy.h"
 #include "../include/stack.h"
 #include "../include/interrupt.h"
+#include "../include/flags.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -297,6 +298,132 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 	
 
 };
+
+static void inc(struct gameboy * gameboy, uint8_t * value);
+static void dec(struct gameboy * gameboy, uint8_t * value);
+static void addToRegA(struct gameboy * gameboy, uint8_t valueToAdd);
+static void addToRegHL(struct gameboy * gameboy, uint8_t valueToAdd);
+static void adc(struct gameboy * gameboy, uint8_t value);
+static void sbc(struct gameboy * gameboy, uint8_t value);
+static void subFromRegA(struct gameboy * gameboy, uint8_t value);
+static void andWithRegA(struct gameboy * gameboy, uint8_t value);
+static void orWithRegA(struct gameboy * gameboy, uint8_t value);
+static void xorWithRegA(struct gameboy * gameboy, uint8_t value);
+static void compareWithRegA(struct gameboy * gameboy, uint8_t value);
+
+static void inc(struct gameboy * gameboy, uint8_t * value)
+{
+	if((*value & 0x0F) == 0x0F){
+		setFlag(gameboy, HALF_CARRY, true);
+	}
+	else {
+		setFlag(gameboy, HALF_CARRY, false);
+	}
+
+	(*value)++;
+
+	if (*value){
+		//if value is not 0
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, SUB, false);
+}
+
+
+static void dec(struct gameboy * gameboy, uint8_t * value)
+{
+	if((*value & 0x0F) == 0x0F){
+		setFlag(gameboy, HALF_CARRY, false);
+	}
+	else {
+		setFlag(gameboy, HALF_CARRY, true);
+	}
+
+	(*value)--;
+
+	if (*value){
+		//if value is not 0
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, SUB, true);
+}
+
+static void addToRegA(struct gameboy * gameboy, uint8_t valueToAdd)
+{
+	uint16_t result = gameboy->cpu.a + valueToAdd;
+	if (result & 0xFF00){
+		setFlag(gameboy, CARRY, true);
+	}
+	else {
+		setFlag(gameboy, CARRY, false);
+	}
+
+	gameboy->cpu.a = result & 0xFF; //why & 0xFF?
+
+	if (gameboy->cpu.a){
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+
+	if (((gameboy->cpu.a & 0x0F) + (valueToAdd & 0x0F)) > 0x0F){
+		setFlag(gameboy, HALF_CARRY, true);
+	}
+	else {
+		setFlag(gameboy, HALF_CARRY, false);
+	}
+
+	setFlag(gameboy, SUB, false); 
+}
+
+static void addToRegHL(struct gameboy * gameboy, uint8_t valueToAdd)
+{
+
+}
+
+static void adc(struct gameboy * gameboy, uint8_t value)
+{
+
+}
+
+static void sbc(struct gameboy * gameboy, uint8_t value)
+{
+
+}
+
+static void subFromRegA(struct gameboy * gameboy, uint8_t value)
+{
+
+}
+
+static void andWithRegA(struct gameboy * gameboy, uint8_t value)
+{
+
+}
+
+static void orWithRegA(struct gameboy * gameboy, uint8_t value)
+{
+
+}
+
+static void xorWithRegA(struct gameboy * gameboy, uint8_t value)
+{
+
+}
+
+static void compareWithRegA(struct gameboy * gameboy, uint8_t value)
+{
+
+}
 
 uint8_t executeNextOpcode(struct gameboy * gameboy)
 {
