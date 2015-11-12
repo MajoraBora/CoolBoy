@@ -27,8 +27,6 @@ static bool spritesEnabled(struct gameboy * gameboy);
 static void renderTiles(struct gameboy * gameboy);
 static void renderSprites(struct gameboy * gameboy);
 static bool windowEnabled(struct gameboy * gameboy);
-static void renderTilesOnWindow(struct gameboy * gameboy);
-static void renderTilesOnBackground(struct gameboy * gameboy);
 
 static struct colour getColour(struct gameboy * gameboy, uint8_t colourNum, uint16_t colourAddress);
 
@@ -303,15 +301,6 @@ static struct colour getColour(struct gameboy * gameboy, uint8_t colourNum, uint
 	colour |= getBit(pal, lo);
 
 	return palette[colour];
-}
-
-static void renderTilesOnWindow(struct gameboy * gameboy)
-{
-}
-
-static void renderTilesOnBackground(struct gameboy * gameboy)
-{
-
 }
 
 static void renderSprites(struct gameboy * gameboy)

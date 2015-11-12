@@ -325,18 +325,18 @@ void cp_a(struct gameboy * gameboy);
 void ret_nz(struct gameboy * gameboy);
 void pop_bc(struct gameboy * gameboy);
 void jp_nz(struct gameboy * gameboy);
-void jp_nn(struct gameboy * gameboy);
-void call_nz_nn(struct gameboy * gameboy);
+void jp_nn(struct gameboy * gameboy, uint16_t nn);
+void call_nz_nn(struct gameboy * gameboy, uint16_t nn);
 void push_bc(struct gameboy * gameboy);
-void add_a_n(struct gameboy * gameboy);
+void add_a_n(struct gameboy * gameboy, uint8_t n);
 void rst_0(struct gameboy * gameboy);
 void ret_z(struct gameboy * gameboy);
 void ret(struct gameboy * gameboy);
-void jp_z_nn(struct gameboy * gameboy);
+void jp_z_nn(struct gameboy * gameboy, uint16_t nn);
 void ext_ops(struct gameboy * gameboy);
-void call_z_nn(struct gameboy * gameboy);
-void call_nn(struct gameboy * gameboy);
-void adc_a_n(struct gameboy * gameboy);
+void call_z_nn(struct gameboy * gameboy, uint16_t nn);
+void call_nn(struct gameboy * gameboy, uint16_t nn);
+void adc_a_n(struct gameboy * gameboy, uint8_t n);
 void rst_8(struct gameboy * gameboy);
 
 //0xD0 - 0xDF
@@ -344,15 +344,15 @@ void ret_nc(struct gameboy * gameboy);
 void pop_de(struct gameboy * gameboy);
 void jp_nc(struct gameboy * gameboy);
 
-void call_nc_nn(struct gameboy * gameboy);
+void call_nc_nn(struct gameboy * gameboy, uint16_t nn);
 void push_de(struct gameboy * gameboy);
-void sub_a_n(struct gameboy * gameboy);
+void sub_a_n(struct gameboy * gameboy, uint8_t n);
 void rst_10(struct gameboy * gameboy);
 void ret_c(struct gameboy * gameboy);
 void reti(struct gameboy * gameboy);
-void jp_c_nn(struct gameboy * gameboy);
-void call_c_nn(struct gameboy * gameboy);
-void sbc_a_n(struct gameboy * gameboy);
+void jp_c_nn(struct gameboy * gameboy, uint16_t nn);
+void call_c_nn(struct gameboy * gameboy, uint16_t nn);
+void sbc_a_n(struct gameboy * gameboy, uint8_t n);
 void rst_18(struct gameboy * gameboy);
 
         //0xE0 - 0xEF
@@ -360,12 +360,12 @@ void ldh_n_a(struct gameboy * gameboy, uint8_t n);
 void pop_hl(struct gameboy * gameboy);
 void ldh_c_a(struct gameboy * gameboy);
 void push_hl(struct gameboy * gameboy);
-void and_n(struct gameboy * gameboy);
+void and_n(struct gameboy * gameboy, uint8_t n);
 void rest_20(struct gameboy * gameboy);
 void add_sp_d(struct gameboy * gameboy);
 void jp_hlp(struct gameboy * gameboy);
 void ld_nnp_a(struct gameboy * gameboy, uint16_t nnp);
-void xor_n(struct gameboy * gameboy);
+void xor_n(struct gameboy * gameboy, uint8_t n);
 void rst_28(struct gameboy * gameboy);
  
   //0xF0 - 0xFF
@@ -373,16 +373,15 @@ void ldh_a_n(struct gameboy * gameboy, uint8_t n);
 void pop_af(struct gameboy * gameboy);
 void di(struct gameboy * gameboy);
 void push_af(struct gameboy * gameboy);
-void or_n(struct gameboy * gameboy);
+void or_n(struct gameboy * gameboy, uint8_t n);
 void rest_30(struct gameboy * gameboy);
 void ldhl_sp_d(struct gameboy * gameboy);
 void ld_sp_hl(struct gameboy * gameboy);
 void ld_a_nnp(struct gameboy * gameboy, uint16_t nnp);
 void ei(struct gameboy * gameboy);
-void cp_n(struct gameboy * gameboy);
+void cp_n(struct gameboy * gameboy, uint8_t n);
 void rst_38(struct gameboy * gameboy);
 
 void undefined(struct gameboy * gameboy);
-
 
 #endif

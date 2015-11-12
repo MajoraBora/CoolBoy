@@ -19,7 +19,10 @@ int main(void)
 
 	loadGame(gameboy, "../games/tetris.gb");
 
-	startEmulationLoop(gameboy);
+	//startEmulationLoop(gameboy);
+	printf("%d\n", gameboy->cpu.c);
+	inc_c(gameboy);
+	printf("%d\n", gameboy->cpu.c);
 
 	destroyGameboy(gameboy);
 
