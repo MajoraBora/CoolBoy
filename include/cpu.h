@@ -324,7 +324,7 @@ void cp_a(struct gameboy * gameboy);
         //0xC0 - 0xCF
 void ret_nz(struct gameboy * gameboy);
 void pop_bc(struct gameboy * gameboy);
-void jp_nz(struct gameboy * gameboy);
+void jp_nz_nn(struct gameboy * gameboy, uint16_t nn);
 void jp_nn(struct gameboy * gameboy, uint16_t nn);
 void call_nz_nn(struct gameboy * gameboy, uint16_t nn);
 void push_bc(struct gameboy * gameboy);
@@ -342,8 +342,7 @@ void rst_8(struct gameboy * gameboy);
 //0xD0 - 0xDF
 void ret_nc(struct gameboy * gameboy);
 void pop_de(struct gameboy * gameboy);
-void jp_nc(struct gameboy * gameboy);
-
+void jp_nc_nn(struct gameboy * gameboy, uint16_t nn);
 void call_nc_nn(struct gameboy * gameboy, uint16_t nn);
 void push_de(struct gameboy * gameboy);
 void sub_a_n(struct gameboy * gameboy, uint8_t n);
