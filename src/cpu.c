@@ -18,7 +18,7 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 	{"DEC B", 0, dec_b, 4},
 	{"LD B, n", 1, ld_b_n, 8},
 	{"RLC A", 0, rlc_a, 8},
-	{"LD (nn), SP", 2, ld_nn_sp, 20},
+	{"LD (nn), SP", 2, ld_nnp_sp, 20},
 	{"ADD HL, BC", 0, add_hl_bc, 8},
 	{"LD A, (BC)", 0, ld_a_bcp, 8},
 	{"DEC BC", 0, dec_bc, 8},
@@ -296,7 +296,6 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
         {"UNDEFINED", 0, undefined, 0},
         {"CP n", 1, cp_n, 8},
         {"RST 38", 0, rst_38, 32}
-	
 
 };
 
@@ -640,12 +639,26 @@ void ld_b_n(struct gameboy * gameboy, uint8_t n)
 
 void rlc_a(struct gameboy * gameboy)
 {
-	printf("rlc_a\n");
+	//rotate A left. old bit 7 to carry flag
+	uint8_t carryBit = gameboy->cpu.a >> 7; //get old bit 7
+	setFlag(gameboy, CARRY, carryBit); //either going to be 1 or 0
+	
+	//shift left by 1, then add the old bit 7 to the other end
+	gameboy->cpu.a <<= 1;
+	gameboy->cpu.a += carryBit;
+
+	if (gameboy->cpu.a == 0){
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, false);
 }
 
-void ld_nn_sp(struct gameboy * gameboy)
+void ld_nnp_sp(struct gameboy * gameboy, uint16_t nn)
 {
-	printf("ld_nn_sp\n");
+	writeByte(gameboy, nn, gameboy->cpu.pc);
+	
 }
 
 void add_hl_bc(struct gameboy * gameboy)
@@ -655,36 +668,48 @@ void add_hl_bc(struct gameboy * gameboy)
 
 void ld_a_bcp(struct gameboy * gameboy)
 {
-	printf("ld_a_bcp\n");
+	uint8_t byteToLoad = readByte(gameboy, gameboy->cpu.bc);
+	gameboy->cpu.a = byteToLoad;
 }
 
 void dec_bc(struct gameboy * gameboy)
 {
-	printf("dec_bc\n");
 	gameboy->cpu.bc--;
 }
 
 void inc_c(struct gameboy * gameboy)
 {
-	printf("inc_c\n");
 	inc(gameboy, &gameboy->cpu.c);
 }
 
 void dec_c(struct gameboy * gameboy)
 {
-	printf("dec_c\n");
 	dec(gameboy, &gameboy->cpu.c);
 }
 
 void ld_c_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("ld_c_n\n");
 	gameboy->cpu.c = n;
 }
 
 void rrc_a(struct gameboy * gameboy)
 {
-	printf("rrc_a\n");
+	//rotate a right, old bit 0 to carry flag
+	uint8_t oldBit = gameboy->cpu.a & 0x01; //get old bit 0
+	setFlag(gameboy, CARRY, oldBit); //store in carry flag
+
+	gameboy->cpu.a >>= 1; //rotate right by 1
+	if (oldBit){ //put old bit 0 to msb if 1
+		gameboy->cpu.a |= 0x80;
+	}
+	
+	if (gameboy->cpu.a == 0){
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, false);
+	
 }
 
 void stop(struct gameboy * gameboy) //0x10
@@ -694,48 +719,57 @@ void stop(struct gameboy * gameboy) //0x10
 
 void ld_de_nn(struct gameboy * gameboy, uint16_t nn) //0x11
 {
-	printf("ld_de_nn\n");
 	gameboy->cpu.de = nn;
 }
 
 void ld_dep_a(struct gameboy * gameboy) //0x12
 {
 	writeByte(gameboy, gameboy->cpu.de, gameboy->cpu.a);
-	printf("ld_dep_a\n");
 }
 
 void inc_de(struct gameboy * gameboy) //0x13
 {
-	printf("inc_de\n");
 	gameboy->cpu.de++;
 }
 
 void inc_d(struct gameboy * gameboy) //0x14
 {
-	printf("inc_d\n");
 	inc(gameboy, &gameboy->cpu.d);
 }
 
 void dec_d(struct gameboy * gameboy) //0x15
 {
-	printf("dec_d\n");
 	dec(gameboy, &gameboy->cpu.d);
 }
 
 void ld_d_n(struct gameboy * gameboy, uint8_t n) //0x16
 {
-	printf("ld_d_n\n");
 	gameboy->cpu.d = n;
 }
 
 void rl_a(struct gameboy * gameboy) //0x17
 {
-	printf("rl_a\n");
+	int carryBit = isFlagSet(gameboy, CARRY); //get current carry	
+	setFlag(gameboy, CARRY, gameboy->cpu.a & 0x80);
+	gameboy->cpu.a <<= 1;
+	gameboy->cpu.a += carryBit;
+
+	if (gameboy->cpu.a == 0){
+		setFlag(gameboy, ZERO, true);
+	}
+	else {
+		setFlag(gameboy, ZERO, false);
+	}
+
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, false);
+
 }
 
-void jr_n(struct gameboy * gameboy) //0x18
+void jr_n(struct gameboy * gameboy, uint8_t n) //0x18
 {
-	printf("jr_n\n");
+	//add n to current address then jump to it
+	gameboy->cpu.pc += (int8_t)n;
 }
 
 void add_hl_de(struct gameboy * gameboy) //0x19
@@ -745,82 +779,111 @@ void add_hl_de(struct gameboy * gameboy) //0x19
 
 void ld_a_dep(struct gameboy * gameboy) //0x1A
 {
-	printf("ld_a_dep\n");
+	//load value at the value of reg DE as an address into a
+	uint8_t dep = readByte(gameboy, gameboy->cpu.de);
+	gameboy->cpu.a = dep;
 }
 
 void dec_de(struct gameboy * gameboy) //0x1B
 {
-	printf("dec_de\n");
 	gameboy->cpu.de--;
 }
 
 void inc_e(struct gameboy * gameboy) //0x1C
 {
-	printf("inc_e\n");
 	inc(gameboy, &gameboy->cpu.e);
 }
 
 void dec_e(struct gameboy * gameboy) //0x1D
 {
-	printf("dec_e\n");
 	dec(gameboy, &gameboy->cpu.e);
 }
 
 void ld_e_n(struct gameboy * gameboy, uint8_t n) //0x1E
 {
-	printf("ld_e_n\n");
 	gameboy->cpu.e = n;
 }
 
 void rr_a(struct gameboy * gameboy) //0x1F
 {
-	printf("rr_a\n");
+	//rotate A right through carry flag
+	//get current carry
+	//shift right by 1
+	//put current carry at bit 7
+	//do flags
+
+	int carryBit = isFlagSet(gameboy, CARRY); //get current carry	
+	setFlag(gameboy, CARRY, gameboy->cpu.a & 0x01); //store new carry
+	gameboy->cpu.a >>= 1; //shift right
+	//gameboy->cpu.a |= carryBit; //put carryBit at the 7th bit
+	gameboy->cpu.a += (carryBit << 7);
+
+	if (gameboy->cpu.a == 0){
+		setFlag(gameboy, ZERO, true);
+	}
+	else {
+		setFlag(gameboy, ZERO, false);
+	}
+
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, false);
 }
 
-void jr_nz_n(struct gameboy * gameboy)
+void jr_nz_n(struct gameboy * gameboy, uint8_t n)
 {
 	printf("jr_nz_n\n");
+	if(!isFlagSet(gameboy, ZERO)){
+		gameboy->cpu.pc += (int8_t)n;
+	}
 }
 
 void ld_hl_nn(struct gameboy * gameboy, uint16_t nn)
 {
-	printf("ld_hl_nn\n");
 	gameboy->cpu.hl = nn;
 }
 
 void ldi_hlp_a(struct gameboy * gameboy)
 {
-	printf("ldi_hlp_a\n");
 	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.a);
+	++gameboy->cpu.hl;
 }
 
 void inc_hl(struct gameboy * gameboy)
 {
-	printf("inc_hl\n");
 	gameboy->cpu.hl++;
 }
 
 void inc_h(struct gameboy * gameboy)
 {
-	printf("inc_h\n");
 	inc(gameboy, &gameboy->cpu.h);
 }
 
 void dec_h(struct gameboy * gameboy)
 {
-	printf("dec_h\n");
 	dec(gameboy, &gameboy->cpu.h);
 }
 
 void ld_h_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("ld_h_n\n");
 	gameboy->cpu.h = n;
 }
 
 void daa(struct gameboy * gameboy)
 {
-	printf("daa\n");
+	//if the lower 4 bits of A form a number greater than 9, or if H is set, then add 0x06 to A
+	//if the upper 4 bits of A form a number greater than 9, or if C is set, then add 0x60 to A
+
+	uint8_t a = gameboy->cpu.a;
+	uint8_t lower = a & 0x0F;
+	uint8_t upper = a & 0xF0;
+	if ((lower > 9) || (isFlagSet(gameboy, HALF_CARRY))){
+		a += 0x06;
+	}
+
+	if ((upper > 9) || (isFlagSet(gameboy, CARRY))){
+		a += 0x60;
+	}
+	
 }
 
 void jr_z_n(struct gameboy * gameboy)
@@ -1866,14 +1929,14 @@ void call_nc_nn(struct gameboy * gameboy, uint16_t nn)
 	printf("call_nc_nn\n");
 	if (!isFlagSet(gameboy, CARRY)){
 		pushWordOntoStack(gameboy, gameboy->cpu.pc);
-		gameboy->pc = nn;
+		gameboy->cpu.pc = nn;
 	}
 }
 
 void push_de(struct gameboy * gameboy)
 {
 	printf("push_de\n");
-	pushWordToStack(gameboy, gameboy->cpu.de);
+	pushWordOntoStack(gameboy, gameboy->cpu.de);
 }
 
 void sub_a_n(struct gameboy * gameboy, uint8_t n)
@@ -1911,7 +1974,7 @@ void jp_c_nn(struct gameboy * gameboy, uint16_t nn)
 	printf("jp_c_nn\n");
 	if (isFlagSet(gameboy, CARRY)){
 		uint16_t word = popWordFromStack(gameboy);
-		gameoby->cpu.pc = word;
+		gameboy->cpu.pc = word;
 	}
 }
 

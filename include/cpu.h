@@ -116,7 +116,7 @@ void inc_b(struct gameboy * gameboy); //4
 void dec_b(struct gameboy * gameboy); //5
 void ld_b_n(struct gameboy * gameboy, uint8_t n); //6
 void rlc_a(struct gameboy * gameboy); //7
-void ld_nn_sp(struct gameboy * gameboy); //8
+void ld_nnp_sp(struct gameboy * gameboy, uint16_t nn); //8
 void add_hl_bc(struct gameboy * gameboy); //9
 void ld_a_bcp(struct gameboy * gameboy); //A
 void dec_bc(struct gameboy * gameboy); //B
@@ -134,7 +134,7 @@ void inc_d(struct gameboy * gameboy); //0x14
 void dec_d(struct gameboy * gameboy); //0x15
 void ld_d_n(struct gameboy * gameboy, uint8_t n); //0x16
 void rl_a(struct gameboy * gameboy); //0x17
-void jr_n(struct gameboy * gameboy); //0x18
+void jr_n(struct gameboy * gameboy, uint8_t n); //0x18
 void add_hl_de(struct gameboy * gameboy); //0x19
 void ld_a_dep(struct gameboy * gameboy); //0x1A
 void dec_de(struct gameboy * gameboy); //0x1B
@@ -144,7 +144,7 @@ void ld_e_n(struct gameboy * gameboy, uint8_t n); //0x1E
 void rr_a(struct gameboy * gameboy); //0x1F
 
 //0x20 - 0x2F
-void jr_nz_n(struct gameboy * gameboy);
+void jr_nz_n(struct gameboy * gameboy, uint8_t n);
 void ld_hl_nn(struct gameboy * gameboy, uint16_t nn);
 void ldi_hlp_a(struct gameboy * gameboy);
 void inc_hl(struct gameboy * gameboy);
