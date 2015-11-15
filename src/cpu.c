@@ -72,7 +72,7 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 	{"DEC (HL)", 0, dec_hl, 12},
 	{"LD (HL), n", 1, ld_hlp_n, 12},
 	{"SCF", 0, scf, 4},
-	{"JR C, n", 1, jr_c, 8},
+	{"JR C, n", 1, jr_c_n, 8},
 	{"ADD HL, SP", 0, add_hl_sp, 8},
 	{"LDD A, (HL)", 0, ldd_a_hl, 8},
 	{"DEC SP", 0, dec_sp, 8},
@@ -269,8 +269,8 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 	{"UNDEFINED", 0, undefined, 0},
 	{"PUSH HL", 0, push_hl, 16},
 	{"AND n", 1, and_n, 8},
-	{"RST 20", 0, rest_20, 32},
-	{"ADD SP, d", 0, add_sp_d, 16},
+	{"RST 20", 0, rst_20, 32},
+	{"ADD SP, d", 0, add_sp_n, 16},
 	{"JP (HL)", 0, jp_hlp, 4},
 	{"LD (nn), A", 2, ld_nnp_a, 16},
 	{"UNDEFINED", 0, undefined, 0},
@@ -287,8 +287,8 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
         {"UNDEFINED", 0, undefined, 0},
         {"PUSH AF", 0, push_af, 16},
         {"OR n", 1, or_n, 8},
-        {"RST 30", 0, rest_30, 32},
-        {"LDHL SP, d", 0, ldhl_sp_d, 12},
+        {"RST 30", 0, rst_30, 32},
+        {"LDHL SP, d", 0, ldhl_sp_n, 12},
         {"LD SP, HL", 0, ld_sp_hl, 8},
         {"LD A, (nn)", 2, ld_a_nnp, 16},
         {"EI", 0, ei, 4}, //enable pending interrupt
@@ -568,7 +568,7 @@ uint8_t executeNextOpcode(struct gameboy * gameboy)
 	uint8_t opcode = readByte(gameboy, gameboy->cpu.pc++);
 	const struct instruction instruction = instructions[opcode];
 
-	printf("%x\n", gameboy->cpu.pc);
+	printf("pc: %x, opcode: %s\n", gameboy->cpu.pc, instruction.instruction);
 
 	switch(instruction.operandLength){
 		case 0:
@@ -581,12 +581,14 @@ uint8_t executeNextOpcode(struct gameboy * gameboy)
 		{
 			//1 operand, get byte
 			uint8_t byte = readByte(gameboy, gameboy->cpu.pc);
+			printf("arg: %x\n", byte);
 			((void(*)(struct gameboy *, uint8_t))instruction.function)(gameboy, byte);
 			break;
 		}
 		case 2:
 		{
 			uint16_t word = readWord(gameboy, gameboy->cpu.pc);
+			printf("arg: %x\n", word);
 			((void(*)(struct gameboy *, uint16_t))instruction.function)(gameboy, word);
 			break;
 		}
@@ -597,43 +599,36 @@ uint8_t executeNextOpcode(struct gameboy * gameboy)
 
 void nop(struct gameboy * gameboy)
 {
-	printf("NOP\n");
 }
 
 void ld_bc_nn(struct gameboy * gameboy, uint16_t nn)
 {
-	printf("ld_bc_nn\n");
 	gameboy->cpu.bc = nn;
 }
 
 void ld_bcp_a(struct gameboy * gameboy)
 {
-	printf("ld_bc_a\n"); //0x02
 	//read the value in BC as an address, then write the value in A to it
 	writeByte(gameboy, gameboy->cpu.bc, gameboy->cpu.a);
 }
 
 void inc_bc(struct gameboy * gameboy)
 {
-	printf("inc_bc\n");
 	gameboy->cpu.bc++;
 }
 
 void inc_b(struct gameboy * gameboy)
 {
-	printf("inc_b\n");
 	inc(gameboy, &gameboy->cpu.b);
 }
 
 void dec_b(struct gameboy * gameboy)
 {
-	printf("dec_b\n");
 	dec(gameboy, &gameboy->cpu.b);
 }
 
 void ld_b_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("ld_b_n\n");
 	gameboy->cpu.b = n;
 }
 
@@ -714,7 +709,7 @@ void rrc_a(struct gameboy * gameboy)
 
 void stop(struct gameboy * gameboy) //0x10
 {
-	printf("stop\n");
+	printf("STOP - need to implement\n");
 }
 
 void ld_de_nn(struct gameboy * gameboy, uint16_t nn) //0x11
@@ -831,7 +826,6 @@ void rr_a(struct gameboy * gameboy) //0x1F
 
 void jr_nz_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("jr_nz_n\n");
 	if(!isFlagSet(gameboy, ZERO)){
 		gameboy->cpu.pc += (int8_t)n;
 	}
@@ -883,12 +877,27 @@ void daa(struct gameboy * gameboy)
 	if ((upper > 9) || (isFlagSet(gameboy, CARRY))){
 		a += 0x60;
 	}
+
+	gameboy->cpu.a = a;
+	
+	if (gameboy->cpu.a){
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, HALF_CARRY, false);
+	//find out what to do with CARRY - reset? set?
 	
 }
 
-void jr_z_n(struct gameboy * gameboy)
+void jr_z_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("jr_z_n\n");
+	//if ZERO is set, jump to pc + n	
+	if (isFlagSet(gameboy, ZERO)){
+		gameboy->cpu.pc += (int8_t)n;
+	}
 }
 
 void add_hl_hl(struct gameboy * gameboy)
@@ -898,46 +907,50 @@ void add_hl_hl(struct gameboy * gameboy)
 
 void ldi_a_hlp(struct gameboy * gameboy)
 {
-	printf("ldi_a_hlp\n");
+	//load value at address HL into a, inc 
+	gameboy->cpu.a = readByte(gameboy, gameboy->cpu.hl);
+	++gameboy->cpu.hl;
 }
 
 void dec_hl(struct gameboy * gameboy)
 {
-	printf("dec_hl\n");
 	gameboy->cpu.hl--;
 }
 
 void ld_l_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("ld_l_n\n");
 	gameboy->cpu.l = n;
 }
 
 void cpl(struct gameboy * gameboy)
 {
-	printf("cpl\n");
+	gameboy->cpu.a = ~gameboy->cpu.a;
+	setFlag(gameboy, SUB, true);
+	setFlag(gameboy, HALF_CARRY, true);
 }
 
-void jr_nc_n(struct gameboy * gameboy)
+void jr_nc_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("jr_nc_n\n");
+	if (!isFlagSet(gameboy, CARRY)){
+		gameboy->cpu.pc += (int8_t)n;
+	}
 }
 
 void ld_sp_nn(struct gameboy * gameboy, uint16_t nn)
 {
-	printf("ld_sp_nn\n");
 	gameboy->cpu.sp = nn;
 }
 
 void ldd_hlp_a(struct gameboy * gameboy)
 {
-	printf("ldd_hlp_a\n");
+	//load a into memory address at HL, decrement HL
+	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.a);
+	--gameboy->cpu.hl;
 	
 }
 
 void inc_sp(struct gameboy * gameboy)
 {
-	printf("inc_sp\n");
 	gameboy->cpu.sp++;
 }
 
@@ -962,12 +975,17 @@ void ld_hlp_n(struct gameboy * gameboy, uint8_t data)
 
 void scf(struct gameboy * gameboy)
 {
-	printf("scf\n");
+	//set the carry flag, reset half carry and sub
+	setFlag(gameboy, CARRY, true);
+	setFlag(gameboy, HALF_CARRY, false);
+	setFlag(gameboy, SUB, false);
 }
 
-void jr_c(struct gameboy * gameboy)
+void jr_c_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("jr_c\n");
+	if (isFlagSet(gameboy, CARRY)){
+		gameboy->cpu.pc += (int8_t)n;
+	}
 }
 
 void add_hl_sp(struct gameboy * gameboy)
@@ -977,13 +995,13 @@ void add_hl_sp(struct gameboy * gameboy)
 
 void ldd_a_hl(struct gameboy * gameboy)
 {
-	printf("ldd_a_hl\n");
+	gameboy->cpu.a = readByte(gameboy, gameboy->cpu.hl);
+	--gameboy->cpu.hl;
 }
 
 void dec_sp(struct gameboy * gameboy)
 {
-	printf("dec_sp\n");
-	gameboy->cpu.sp--;
+	--gameboy->cpu.sp;
 }
 
 void inc_a(struct gameboy * gameboy)
@@ -993,115 +1011,99 @@ void inc_a(struct gameboy * gameboy)
 
 void dec_a(struct gameboy * gameboy)
 {
-	printf("dec_a\n");
 	dec(gameboy, &gameboy->cpu.a);
 }
 
 void ld_a_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("ld_a_n\n");
 	gameboy->cpu.a = n;
 }
 
 void ccf(struct gameboy * gameboy)
 {
-	printf("ccf\n");
+	//complement carry flag
+	bool flagState = isFlagSet(gameboy, CARRY);
+	setFlag(gameboy, CARRY, !flagState);
 }
 
         // 0x40 - 0x4F
 void ld_b_b(struct gameboy * gameboy)
 {
-	printf("ld_b_b\n");
 	//do nothing
 }
 
 void ld_b_c(struct gameboy * gameboy)
 {
-	printf("ld_b_c\n");
 	gameboy->cpu.b = gameboy->cpu.c;
 }
 
 void ld_b_d(struct gameboy * gameboy)
 {
-	printf("ld_b_d\n");
 	gameboy->cpu.b = gameboy->cpu.d;
 }
 
 void ld_b_e(struct gameboy * gameboy)
 {
-	printf("ld_b_e\n");
 	gameboy->cpu.b = gameboy->cpu.e;
 }
 
 void ld_b_h(struct gameboy * gameboy)
 {
-	printf("ld_b_h\n");
 	gameboy->cpu.b = gameboy->cpu.h;
 }
 
 void ld_b_l(struct gameboy * gameboy)
 {
-	printf("ld_b_l\n");
 	gameboy->cpu.b = gameboy->cpu.l;
 }
 
 void ld_b_hlp(struct gameboy * gameboy)
 {
-	printf("ld_b_hlp\n");
 	gameboy->cpu.b = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_b_a(struct gameboy * gameboy)
 {
-	printf("ld_b_a\n");
 	gameboy->cpu.b = gameboy->cpu.a;
 }
 
 void ld_c_b(struct gameboy * gameboy)
 {
-	printf("ld_c_b\n");
 	gameboy->cpu.c = gameboy->cpu.b;
 }
 
 void ld_c_c(struct gameboy * gameboy)
 {
-	printf("ld_c_c\n");
 	//do nothing
 }
 
 void ld_c_d(struct gameboy * gameboy)
 {
-	printf("ld_c_d\n");
 	gameboy->cpu.c = gameboy->cpu.d;
 }
 
 void ld_c_e(struct gameboy * gameboy)
 {
-	printf("ld_c_e\n");
 	gameboy->cpu.c = gameboy->cpu.e;
 }
 
 void ld_c_h(struct gameboy * gameboy)
 {
-	printf("ld_c_h\n");
 	gameboy->cpu.c = gameboy->cpu.h;
 }
 
 void ld_c_l(struct gameboy * gameboy)
 {
-	printf("ld_c_l\n");
 	gameboy->cpu.c = gameboy->cpu.l;
 }
 
 void ld_c_hlp(struct gameboy * gameboy)
 {
-	printf("ld_c_hlp\n");
 	gameboy->cpu.c = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_c_a(struct gameboy * gameboy)
 {
-	printf("ld_c_a\n");
 	gameboy->cpu.c = gameboy->cpu.a;
 }
 
@@ -1111,97 +1113,81 @@ void ld_c_a(struct gameboy * gameboy)
 
 void ld_d_b(struct gameboy * gameboy)
 {
-	printf("ld_d_b\n");
 	gameboy->cpu.d = gameboy->cpu.b;
 }
 
 void ld_d_c(struct gameboy * gameboy)
 {
-	printf("ld_d_c\n");
 	gameboy->cpu.d = gameboy->cpu.c;
 }
 
 void ld_d_d(struct gameboy * gameboy)
 {
-	printf("ld_d_d\n");
 	//do nothing
 }
 
 void ld_d_e(struct gameboy * gameboy)
 {
-	printf("ld_d_e\n");
 	gameboy->cpu.d = gameboy->cpu.e;
 }
 
 void ld_d_h(struct gameboy * gameboy)
 {
-	printf("ld_d_h\n");
 	gameboy->cpu.d = gameboy->cpu.h;
 }
 
 void ld_d_l(struct gameboy * gameboy)
 {
-	printf("ld_d_l\n");
 	gameboy->cpu.d = gameboy->cpu.l;
 }
 
 void ld_d_hlp(struct gameboy * gameboy)
 {
-	printf("ld_d_hlp\n");
 	gameboy->cpu.d = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_d_a(struct gameboy * gameboy)
 {
-	printf("ld_d_a\n");
 	gameboy->cpu.d = gameboy->cpu.a;
 }
 
 void ld_e_b(struct gameboy * gameboy)
 {
-	printf("ld_e_b\n");
 	gameboy->cpu.e = gameboy->cpu.b;
 }
 
 void ld_e_c(struct gameboy * gameboy)
 {
-	printf("ld_e_c\n");
 	gameboy->cpu.e = gameboy->cpu.c;
 }
 
 void ld_e_d(struct gameboy * gameboy)
 {
-	printf("ld_e_d\n");
 	gameboy->cpu.e = gameboy->cpu.d;
 }
 
 void ld_e_e(struct gameboy * gameboy)
 {
-	printf("ld_e_e\n");
 	//do nothing
 }
 
 void ld_e_h(struct gameboy * gameboy)
 {
-	printf("ld_e_h\n");
 	gameboy->cpu.e = gameboy->cpu.h;
 }
 
 void ld_e_l(struct gameboy * gameboy)
 {
-	printf("ld_e_l\n");
 	gameboy->cpu.e = gameboy->cpu.l;
 }
 
 void ld_e_hlp(struct gameboy * gameboy)
 {
-	printf("ld_e_hlp\n");
 	gameboy->cpu.e = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_e_a(struct gameboy * gameboy)
 {
-	printf("ld_e_a\n");
 	gameboy->cpu.e = gameboy->cpu.a;
 }
 
@@ -1209,97 +1195,81 @@ void ld_e_a(struct gameboy * gameboy)
 
 void ld_h_b(struct gameboy * gameboy)
 {
-	printf("ld_h_b\n");
 	gameboy->cpu.h = gameboy->cpu.b;
 }
 
 void ld_h_c(struct gameboy * gameboy)
 {
-	printf("ld_h_c\n");
 	gameboy->cpu.h = gameboy->cpu.c;
 }
 
 void ld_h_d(struct gameboy * gameboy)
 {
-	printf("ld_h_d\n");
 	gameboy->cpu.h = gameboy->cpu.d;
 }
 
 void ld_h_e(struct gameboy * gameboy)
 {
-	printf("ld_h_e\n");
 	gameboy->cpu.h = gameboy->cpu.e;
 }
 
 void ld_h_h(struct gameboy * gameboy)
 {
-	printf("ld_h_h\n");
 	//do nothing
 }
 
 void ld_h_l(struct gameboy * gameboy)
 {
-	printf("ld_h_l\n");
 	gameboy->cpu.h = gameboy->cpu.l;
 }
 
 void ld_h_hlp(struct gameboy * gameboy)
 {
-	printf("ld_h_hlp\n");
 	gameboy->cpu.h = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_h_a(struct gameboy * gameboy)
 {
-	printf("ld_h_a\n");
 	gameboy->cpu.h = gameboy->cpu.a;
 }
 
 void ld_l_b(struct gameboy * gameboy)
 {
-	printf("ld_l_b\n");
 	gameboy->cpu.l = gameboy->cpu.b;
 }
 
 void ld_l_c(struct gameboy * gameboy)
 {
-	printf("ld_l_c\n");
 	gameboy->cpu.l = gameboy->cpu.c;
 }
 
 void ld_l_d(struct gameboy * gameboy)
 {
-	printf("ld_l_d\n");
 	gameboy->cpu.l = gameboy->cpu.d;
 }
 
 void ld_l_e(struct gameboy * gameboy)
 {
-	printf("ld_l_e\n");
 	gameboy->cpu.l = gameboy->cpu.e;
 }
 
 void ld_l_h(struct gameboy * gameboy)
 {
-	printf("ld_l_h\n");
 	gameboy->cpu.l = gameboy->cpu.h;
 }
 
 void ld_l_l(struct gameboy * gameboy)
 {
-	printf("ld_l_l\n");
 	//do nothing
 }
 
 void ld_l_hlp(struct gameboy * gameboy)
 {
-	printf("ld_l_hlp\n");
 	gameboy->cpu.l = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_l_a(struct gameboy * gameboy)
 {
-	printf("ld_l_a\n");
 	gameboy->cpu.l = gameboy->cpu.a;
 }
 
@@ -1307,96 +1277,81 @@ void ld_l_a(struct gameboy * gameboy)
 
 void ld_hlp_b(struct gameboy * gameboy)
 {
-	printf("ld_hlp_b\n");
 	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.b);
 }
 
 void ld_hlp_c(struct gameboy * gameboy)
 {
-	printf("ld_hlp_c\n");
 	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.c);
 }
 
 void ld_hlp_d(struct gameboy * gameboy)
 {
-	printf("ld_hlp_d\n");
 	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.d);
 }
 
 void ld_hlp_e(struct gameboy * gameboy)
 {
-	printf("ld_hlp_e\n");
 	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.e);
 }
 
 void ld_hlp_h(struct gameboy * gameboy)
 {
-	printf("ld_hlp_h\n");
 	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.h);
 }
 
 void ld_hlp_l(struct gameboy * gameboy)
 {
-	printf("ld_hlp_l\n");
 	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.l);
 }
 
 void halt(struct gameboy * gameboy)
 {
-	printf("halt\n");
+	printf("HALT - need to implement\n");
 }
 
 void ld_hlp_a(struct gameboy * gameboy)
 {
-	printf("ld_hlp_a\n");
 	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.a);
 }
 
 void ld_a_b(struct gameboy * gameboy)
 {
-	printf("ld_a_b\n");
 	gameboy->cpu.a = gameboy->cpu.b;
 }
 
 void ld_a_c(struct gameboy * gameboy)
 {
-	printf("ld_a_c\n");
 	gameboy->cpu.a = gameboy->cpu.c;
 }
 
 void ld_a_d(struct gameboy * gameboy)
 {
-	printf("ld_a_d\n");
 	gameboy->cpu.a = gameboy->cpu.d;
 }
 
 void ld_a_e(struct gameboy * gameboy)
 {
-	printf("ld_a_e\n");
 	gameboy->cpu.a = gameboy->cpu.e;
 }
 
 void ld_a_h(struct gameboy * gameboy)
 {
-	printf("ld_a_h\n");
 	gameboy->cpu.a = gameboy->cpu.h;
 }
 
 void ld_a_l(struct gameboy * gameboy)
 {
-	printf("ld_a_l\n");
 	gameboy->cpu.a = gameboy->cpu.l;
 }
 
 void ld_a_hlp(struct gameboy * gameboy)
 {
-	printf("ld_a_hlp\n");
 	gameboy->cpu.a = readByte(gameboy, gameboy->cpu.hl);
 }
 
 void ld_a_a(struct gameboy * gameboy)
 {
-	printf("ld_a_a\n");
 	gameboy->cpu.a = gameboy->cpu.a;
 }
 
@@ -1429,13 +1384,11 @@ void add_a_h(struct gameboy * gameboy)
 
 void add_a_l(struct gameboy * gameboy)
 {
-	printf("add_a_l\n");
 	addToRegA(gameboy, gameboy->cpu.l);
 }
 
 void add_a_hlp(struct gameboy * gameboy)
 {
-	printf("add_a_hlp\n");
 	uint8_t byteToAdd = readByte(gameboy, gameboy->cpu.hl);
 	addToRegA(gameboy, byteToAdd);
 
@@ -1443,56 +1396,47 @@ void add_a_hlp(struct gameboy * gameboy)
 
 void add_a_a(struct gameboy * gameboy)
 {
-	printf("add_a_a\n");
 	addToRegA(gameboy, gameboy->cpu.a);
 }
 
 void adc_a_b(struct gameboy * gameboy)
 {
-	printf("adc_a_b\n");
 	adcToRegA(gameboy, gameboy->cpu.b);
 }
 
 void adc_a_c(struct gameboy * gameboy)
 {
-	printf("adc_a_c\n");
 	adcToRegA(gameboy, gameboy->cpu.c);
 }
 
 void adc_a_d(struct gameboy * gameboy)
 {
-	printf("adc_a_d\n");
 	adcToRegA(gameboy, gameboy->cpu.d);
 }
 
 void adc_a_e(struct gameboy * gameboy)
 {
-	printf("adc_a_e\n");
 	adcToRegA(gameboy, gameboy->cpu.e);
 }
 
 void adc_a_h(struct gameboy * gameboy)
 {
-	printf("adc_a_h\n");
 	adcToRegA(gameboy, gameboy->cpu.h);
 }
 
 void adc_a_l(struct gameboy * gameboy)
 {
-	printf("adc_a_l\n");
 	adcToRegA(gameboy, gameboy->cpu.l);
 }
 
 void adc_a_hlp(struct gameboy * gameboy)
 {
-	printf("adc_a_hlp\n");
 	uint8_t byteToAdc = readByte(gameboy, gameboy->cpu.hl);
 	adcToRegA(gameboy, byteToAdc);
 }
 
 void adc_a_a(struct gameboy * gameboy)
 {
-	printf("adc_a_a\n");
 	adcToRegA(gameboy, gameboy->cpu.a);
 }
 
@@ -1500,99 +1444,83 @@ void adc_a_a(struct gameboy * gameboy)
 
 void sub_a_b(struct gameboy * gameboy)
 {
-	printf("sub_a_b\n");
 	subFromRegA(gameboy, gameboy->cpu.b);
 }
 
 void sub_a_c(struct gameboy * gameboy)
 {
-	printf("sub_a_c\n");
 	subFromRegA(gameboy, gameboy->cpu.c);
 }
 
 void sub_a_d(struct gameboy * gameboy)
 {
-	printf("sub_a_d\n");
 	subFromRegA(gameboy, gameboy->cpu.d);
 }
 
 void sub_a_e(struct gameboy * gameboy)
 {
-	printf("sub_a_e\n");
 	subFromRegA(gameboy, gameboy->cpu.e);
 }
 
 void sub_a_h(struct gameboy * gameboy)
 {
-	printf("sub_a_h\n");
 	subFromRegA(gameboy, gameboy->cpu.h);
 }
 
 void sub_a_l(struct gameboy * gameboy)
 {
-	printf("sub_a_l\n");
 	subFromRegA(gameboy, gameboy->cpu.l);
 }
 
 void sub_a_hlp(struct gameboy * gameboy)
 {
-	printf("sub_a_hlp\n");
 	uint8_t byteToSub = readByte(gameboy, gameboy->cpu.hl);
 	subFromRegA(gameboy, byteToSub);
 }
 
 void sub_a_a(struct gameboy * gameboy)
 {
-	printf("sub_a_a\n");
 	subFromRegA(gameboy, gameboy->cpu.a);
 }
 
 void sbc_a_b(struct gameboy * gameboy)
 {
-	printf("sbc_a_b\n");
 	sbcFromRegA(gameboy, gameboy->cpu.b);
 }
 
 void sbc_a_c(struct gameboy * gameboy)
 {
-	printf("sbc_a_c\n");
 	sbcFromRegA(gameboy, gameboy->cpu.c);
 }
 
 void sbc_a_d(struct gameboy * gameboy)
 {
-	printf("sbc_a_d\n");
 	sbcFromRegA(gameboy, gameboy->cpu.d);
 }
 
 void sbc_a_e(struct gameboy * gameboy)
 {
-	printf("sbc_a_e\n");
 	sbcFromRegA(gameboy, gameboy->cpu.e);
 }
 
 void sbc_a_h(struct gameboy * gameboy)
 {
-	printf("sbc_a_h\n");
 	sbcFromRegA(gameboy, gameboy->cpu.h);
 }
 
 void sbc_a_l(struct gameboy * gameboy)
 {
-	printf("sbc_a_l\n");
 	sbcFromRegA(gameboy, gameboy->cpu.l);
 }
 
 void sbc_a_hlp(struct gameboy * gameboy)
 {
-	printf("sbc_a_hlp\n");
 	uint8_t byteToSbc = readByte(gameboy, gameboy->cpu.hl);
 	sbcFromRegA(gameboy, byteToSbc);
 }
 
 void sbc_a_a(struct gameboy * gameboy)
 {
-	printf("sbc_a_a\n");
 	sbcFromRegA(gameboy, gameboy->cpu.a);
 }
 
@@ -1600,50 +1528,42 @@ void sbc_a_a(struct gameboy * gameboy)
 
 void and_b(struct gameboy * gameboy)
 {
-	printf("and_b\n");
 	andWithRegA(gameboy, gameboy->cpu.b);
 }
 
 void and_c(struct gameboy * gameboy)
 {
-	printf("and_c\n");
 	andWithRegA(gameboy, gameboy->cpu.c);
 }
 
 void and_d(struct gameboy * gameboy)
 {
-	printf("and_d\n");
 	andWithRegA(gameboy, gameboy->cpu.d);
 }
 
 void and_e(struct gameboy * gameboy)
 {
-	printf("and_e\n");
 	andWithRegA(gameboy, gameboy->cpu.e);
 }
 
 void and_h(struct gameboy * gameboy)
 {
-	printf("and_h\n");
 	andWithRegA(gameboy, gameboy->cpu.h);
 }
 
 void and_l(struct gameboy * gameboy)
 {
-	printf("and_l\n");
 	andWithRegA(gameboy, gameboy->cpu.l);
 }
 
 void and_hlp(struct gameboy * gameboy)
 {
-	printf("and_hlp\n");
 	uint8_t byteToAnd = readByte(gameboy, gameboy->cpu.hl);
 	andWithRegA(gameboy, byteToAnd);
 }
 
 void and_a(struct gameboy * gameboy)
 {
-	printf("and_a\n");
 	andWithRegA(gameboy, gameboy->cpu.a);
 }
 
@@ -1702,74 +1622,62 @@ void or_c(struct gameboy * gameboy)
 
 void or_d(struct gameboy * gameboy)
 {
-	printf("or_d\n");
 	orWithRegA(gameboy, gameboy->cpu.d);
 }
 
 void or_e(struct gameboy * gameboy)
 {
-	printf("or_e\n");
 	orWithRegA(gameboy, gameboy->cpu.e);
 }
 
 void or_h(struct gameboy * gameboy)
 {
-	printf("or_h\n");
 	orWithRegA(gameboy, gameboy->cpu.h);
 }
 
 void or_l(struct gameboy * gameboy)
 {
-	printf("or_l\n");
 	orWithRegA(gameboy, gameboy->cpu.l);
 }
 
 void or_hlp(struct gameboy * gameboy)
 {
-	printf("or_hlp\n");
 	uint8_t byteToOr = readByte(gameboy, gameboy->cpu.hl);
 	orWithRegA(gameboy, byteToOr);
 }
 
 void or_a(struct gameboy * gameboy)
 {
-	printf("or_a\n");
 	orWithRegA(gameboy, gameboy->cpu.a);
 }
 
 void cp_b(struct gameboy * gameboy)
 {
-	printf("cp_b\n");
 	compareWithRegA(gameboy, gameboy->cpu.b);
 }
 
 void cp_c(struct gameboy * gameboy)
 {
-	printf("cp_c\n");
 	compareWithRegA(gameboy, gameboy->cpu.c);
 }
 
 void cp_d(struct gameboy * gameboy)
 {
-	printf("cp_d\n");
 	compareWithRegA(gameboy, gameboy->cpu.d);
 }
 
 void cp_e(struct gameboy * gameboy)
 {
-	printf("cp_e\n");
 	compareWithRegA(gameboy, gameboy->cpu.e);
 }
 
 void cp_h(struct gameboy * gameboy)
 {
-	printf("cp_h\n");
 	compareWithRegA(gameboy, gameboy->cpu.h);
 }
 
 void cp_l(struct gameboy * gameboy)
 {
-	printf("cp_l\n");
 	compareWithRegA(gameboy, gameboy->cpu.l);
 }
 
@@ -1797,7 +1705,6 @@ void ret_nz(struct gameboy * gameboy)
 
 void pop_bc(struct gameboy * gameboy)
 {
-	printf("pop_bc\n");
 	gameboy->cpu.bc = popWordFromStack(gameboy);
 }
 
@@ -1825,23 +1732,22 @@ void call_nz_nn(struct gameboy * gameboy, uint16_t nn)
 
 void push_bc(struct gameboy * gameboy)
 {
-	printf("push_bc\n");
+	pushWordOntoStack(gameboy, gameboy->cpu.bc);
 }
 
 void add_a_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("add_a_n\n");
 	addToRegA(gameboy, n);
 }
 
 void rst_0(struct gameboy * gameboy)
 {
-	printf("rst_0\n");
+	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	gameboy->cpu.pc = 0x0;
 }
 
 void ret_z(struct gameboy * gameboy)
 {
-	printf("ret_z\n");
 	if (isFlagSet(gameboy, ZERO)){
 		uint16_t word = popWordFromStack(gameboy);
 		gameboy->cpu.pc = word;
@@ -1858,7 +1764,6 @@ void ret(struct gameboy * gameboy)
 
 void jp_z_nn(struct gameboy * gameboy, uint16_t nn)
 {
-	printf("jp_z_nn\n");
 	//jump to nn if ZERO is set
 	if (isFlagSet(gameboy, ZERO)){
 		gameboy->cpu.pc = nn;
@@ -1880,28 +1785,25 @@ void call_z_nn(struct gameboy * gameboy, uint16_t nn)
 
 void call_nn(struct gameboy * gameboy, uint16_t nn)
 {
-	printf("call_nn\n");
 	pushWordOntoStack(gameboy, gameboy->cpu.pc);
 	gameboy->cpu.pc = nn;
 }
 
 void adc_a_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("adc_a_n\n");
+	adcToRegA(gameboy, n);
 }
 
 void rst_8(struct gameboy * gameboy)
 {
-	printf("rst_8\n");
+	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	gameboy->cpu.pc = 0x08;
+
 }
 
-
-
 //0xD0 - 0xDF
-
 void ret_nc(struct gameboy * gameboy)
 {
-	printf("ret_nc\n");
 	//return if CARRY is not set
 	if (!isFlagSet(gameboy, CARRY)){
 		uint16_t word = popWordFromStack(gameboy);
@@ -1911,14 +1813,12 @@ void ret_nc(struct gameboy * gameboy)
 
 void pop_de(struct gameboy * gameboy)
 {
-	printf("pop_de\n");
 	//pop top value from stack into register DE
 	gameboy->cpu.de = popWordFromStack(gameboy);
 }
 
 void jp_nc_nn(struct gameboy * gameboy, uint16_t nn)
 {
-	printf("jp_nc\n");
 	if (!isFlagSet(gameboy, CARRY)){
 		gameboy->cpu.pc = nn;
 	}
@@ -1926,7 +1826,6 @@ void jp_nc_nn(struct gameboy * gameboy, uint16_t nn)
 
 void call_nc_nn(struct gameboy * gameboy, uint16_t nn)
 {
-	printf("call_nc_nn\n");
 	if (!isFlagSet(gameboy, CARRY)){
 		pushWordOntoStack(gameboy, gameboy->cpu.pc);
 		gameboy->cpu.pc = nn;
@@ -1935,23 +1834,22 @@ void call_nc_nn(struct gameboy * gameboy, uint16_t nn)
 
 void push_de(struct gameboy * gameboy)
 {
-	printf("push_de\n");
 	pushWordOntoStack(gameboy, gameboy->cpu.de);
 }
 
 void sub_a_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("sub_a_n\n");
+	subFromRegA(gameboy, n);
 }
 
 void rst_10(struct gameboy * gameboy)
 {
-	printf("rst_10\n");
+	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	gameboy->cpu.pc = 0x10;
 }
 
 void ret_c(struct gameboy * gameboy)
 {
-	printf("ret_c\n");
 	//return if CARRY is set
 	if (isFlagSet(gameboy, CARRY)){
 		uint16_t word = popWordFromStack(gameboy);
@@ -1962,7 +1860,6 @@ void ret_c(struct gameboy * gameboy)
 
 void reti(struct gameboy * gameboy)
 {
-	printf("reti\n");
 	//return from interrupt
 	uint16_t word = popWordFromStack(gameboy);
 	gameboy->cpu.pc = word;
@@ -1971,7 +1868,6 @@ void reti(struct gameboy * gameboy)
 
 void jp_c_nn(struct gameboy * gameboy, uint16_t nn)
 {
-	printf("jp_c_nn\n");
 	if (isFlagSet(gameboy, CARRY)){
 		uint16_t word = popWordFromStack(gameboy);
 		gameboy->cpu.pc = word;
@@ -1980,7 +1876,6 @@ void jp_c_nn(struct gameboy * gameboy, uint16_t nn)
 
 void call_c_nn(struct gameboy * gameboy, uint16_t nn)
 {
-	printf("call_c_nn\n");
 	if (isFlagSet(gameboy, CARRY)){
 		pushWordOntoStack(gameboy, gameboy->cpu.pc);
 		gameboy->cpu.pc = nn;
@@ -1989,86 +1884,99 @@ void call_c_nn(struct gameboy * gameboy, uint16_t nn)
 
 void sbc_a_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("sbc_a_n\n");
+	sbcFromRegA(gameboy, n);
 }
 
 void rst_18(struct gameboy * gameboy)
 {
-	printf("rst_18\n");
+	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	gameboy->cpu.pc = 0x18;
 }
 
-
-
-        //0xE0 - 0xEF
-
+//0xE0 - 0xEF
 void ldh_n_a(struct gameboy * gameboy, uint8_t n)
 {
-	printf("ldh_n_a\n");
 	//put a into memory address FF00+n
 	writeByte(gameboy, LDH_BASE + n, gameboy->cpu.a);
 }
 
 void pop_hl(struct gameboy * gameboy)
 {
-	printf("pop_hl\n");
+	gameboy->cpu.hl = popWordFromStack(gameboy);
 }
 
 void ldh_c_a(struct gameboy * gameboy)
 {
-	printf("ldh_c_a\n");
 	//put A into address FF00 + reg C
 	writeByte(gameboy, LDH_BASE + gameboy->cpu.c, gameboy->cpu.a);
 }
 
 void push_hl(struct gameboy * gameboy)
 {
-	printf("push_hl\n");
+	pushWordOntoStack(gameboy, gameboy->cpu.hl);
 }
 
 void and_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("and_n\n");
+	andWithRegA(gameboy, n);
 }
 
-void rest_20(struct gameboy * gameboy)
+void rst_20(struct gameboy * gameboy)
 {
-	printf("rest_20\n");
+	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	gameboy->cpu.pc = 0x20;
 }
 
-void add_sp_d(struct gameboy * gameboy)
+void add_sp_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("add_sp_d\n");
+	int result = gameboy->cpu.sp + n;
+	if (result & 0xFFFF0000){
+		setFlag(gameboy, CARRY, true);
+	}
+	else {
+		setFlag(gameboy, CARRY, false);
+	}
+
+	gameboy->cpu.sp = result & 0xFFFF; //why 0xFFFF?
+	
+	if (((gameboy->cpu.sp & 0x0F) + (n & 0x0F)) > 0x0F){
+		setFlag(gameboy, HALF_CARRY, true);
+	}
+	else {
+		setFlag(gameboy, HALF_CARRY, false);
+	}
+
+	setFlag(gameboy, ZERO, false);
+	setFlag(gameboy, SUB, false);
 }
 
 void jp_hlp(struct gameboy * gameboy)
 {
-	printf("jp_hlp\n");
 	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
 	gameboy->cpu.pc = byte;
 }
 
 void ld_nnp_a(struct gameboy * gameboy, uint16_t nnp)
 {
-	printf("ld_nnp_a\n");
 	//load value in a to address nnp
 	writeByte(gameboy, nnp, gameboy->cpu.a);	
 }
 
 void xor_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("xor_n\n");
+	xorWithRegA(gameboy, n);
 }
 
 void rst_28(struct gameboy * gameboy)
 {
-	printf("rst_28\n");
+	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	gameboy->cpu.pc = 0x28;
 }
 
   //0xF0 - 0xFF
 
 void ldh_a_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("ldh_a_n\n");
 	//put memory address FF00 + n into A
 	gameboy->cpu.a = readByte(gameboy, LDH_BASE + n);
 	
@@ -2076,69 +1984,82 @@ void ldh_a_n(struct gameboy * gameboy, uint8_t n)
 
 void pop_af(struct gameboy * gameboy)
 {
-	printf("pop_af\n");
+	gameboy->cpu.af = popWordFromStack(gameboy);
 }
 
 void di(struct gameboy * gameboy)
 {
-	printf("di\n");
 	setInterruptMasterFlag(gameboy, false);
 }
 
 void push_af(struct gameboy * gameboy)
 {
-	printf("push_af\n");
+	pushWordOntoStack(gameboy, gameboy->cpu.af);
 }
 
 void or_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("or_n\n");
+	orWithRegA(gameboy, n);
 }
 
-void rest_30(struct gameboy * gameboy)
+void rst_30(struct gameboy * gameboy)
 {
-	printf("rest_30\n");
+	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	gameboy->cpu.pc = 0x30;
 }
 
-void ldhl_sp_d(struct gameboy * gameboy)
+void ldhl_sp_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("ldhl_sp_d\n");
-	
+	int result = gameboy->cpu.sp +(int8_t)n;
+	if (result & 0xFFFF0000){
+		setFlag(gameboy, CARRY, true);
+	}
+	else {
+		setFlag(gameboy, CARRY, false);
+	}
+
+	if (((gameboy->cpu.sp & 0x0F) + (n & 0x0F)) > 0x0F){
+		setFlag(gameboy, HALF_CARRY, true);
+	}
+	else {
+		setFlag(gameboy, HALF_CARRY, false);
+	}
+
+	setFlag(gameboy, ZERO, false);
+	setFlag(gameboy, SUB, false);
+
+	gameboy->cpu.hl = (uint16_t)(result & 0xFFFF);
 }
 
 void ld_sp_hl(struct gameboy * gameboy)
 {
-	printf("ld_sp_hl\n");
 	gameboy->cpu.sp = gameboy->cpu.hl;
 }
 
 void ld_a_nnp(struct gameboy * gameboy, uint16_t nnp)
 {
-	printf("ld_a_nnp\n");
 	//read data as address
 	gameboy->cpu.a = readByte(gameboy, nnp);
 }
 
 void ei(struct gameboy * gameboy)
 {
-	printf("ei\n");
 	//enable interrupt
 	setInterruptMasterFlag(gameboy, true);
 }
 
 void cp_n(struct gameboy * gameboy, uint8_t n)
 {
-	printf("cp_n\n");
+	compareWithRegA(gameboy, gameboy->cpu.l);
 }
 
 void rst_38(struct gameboy * gameboy)
 {
-	printf("rst_38\n");
+	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	gameboy->cpu.pc = 0x38;
 }
-
 
 void undefined(struct gameboy * gameboy)
 {
-	printf("undefined\n");
 	gameboy->cpu.pc--;
 }

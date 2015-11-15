@@ -19,14 +19,8 @@ int main(void)
 
 	loadGame(gameboy, "../games/tetris.gb");
 
-	//startEmulationLoop(gameboy);
+	startEmulationLoop(gameboy);
 
-	gameboy->cpu.a = 1;
-	gameboy->cpu.f = 0;
-	for (int i = 0; i < 10; i++){
-		printf("%d, %d\n", gameboy->cpu.a, gameboy->cpu.f);
-		rl_a(gameboy);
-	}
 	return 0;
 
 
