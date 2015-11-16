@@ -1,5 +1,6 @@
 //got to line 1586
 #include "../include/cpu.h"
+#include "../include/extops.h"
 #include "../include/gameboy.h"
 #include "../include/stack.h"
 #include "../include/interrupt.h"
@@ -237,7 +238,7 @@ const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 	{"RET Z", 0, ret_z, 8},
 	{"RET", 0, ret, 8},
 	{"JP Z, nn", 2, jp_z_nn, 12},
-	{"Ext ops", 0, ext_ops, 0}, //goes into other table here - extended opcodes
+	{"Ext ops", 1, ext_ops, 0}, //goes into other table here - extended opcodes
 	{"CALL Z, nn", 2, call_z_nn, 12},
 	{"CALL nn", 2, call_nn, 12},
 	{"ADC A, n", 1, adc_a_n, 8},
@@ -1771,9 +1772,9 @@ void jp_z_nn(struct gameboy * gameboy, uint16_t nn)
 	}
 }
 
-void ext_ops(struct gameboy * gameboy)
+void ext_ops(struct gameboy * gameboy, uint8_t opcode)
 {
-	printf("ext_ops\n");
+	executeExtendedOpcode(gameboy, opcode);
 }
 
 void call_z_nn(struct gameboy * gameboy, uint16_t nn)

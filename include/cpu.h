@@ -333,7 +333,7 @@ void rst_0(struct gameboy * gameboy);
 void ret_z(struct gameboy * gameboy);
 void ret(struct gameboy * gameboy);
 void jp_z_nn(struct gameboy * gameboy, uint16_t nn);
-void ext_ops(struct gameboy * gameboy);
+void ext_ops(struct gameboy * gameboy, uint8_t opcode);
 void call_z_nn(struct gameboy * gameboy, uint16_t nn);
 void call_nn(struct gameboy * gameboy, uint16_t nn);
 void adc_a_n(struct gameboy * gameboy, uint8_t n);
