@@ -1,6 +1,20 @@
 #include "../include/extops.h"
 #include "../include/gameboy.h"
+#include "../include/flags.h"
 #include <stdio.h>
+
+static void rlc(struct gameboy * gameboy, uint8_t * value);
+static void rrc(struct gameboy * gameboy, uint8_t * value);
+static void rl(struct gameboy * gameboy, uint8_t * value);
+static void rr(struct gameboy * gameboy, uint8_t * value);
+static void sla(struct gameboy * gameboy, uint8_t * value);
+static void sra(struct gameboy * gameboy, uint8_t * value);
+static void swap(struct gameboy * gameboy, uint8_t * value);
+static void srl(struct gameboy * gameboy, uint8_t * value);
+//test bit (bit) in register (reg)
+static void testBit(struct gameboy * gameboy, uint8_t bit, uint8_t reg);
+static void setBit(struct gameboy * gameboy, uint8_t bit, uint8_t * reg);
+
 
 const struct extendedInstruction extendedInstructions[NO_OF_EXT_INSTRUCTIONS] = {
 	{ "RLC B", cb_rlc_b, 8},           // 0x00
@@ -260,6 +274,215 @@ const struct extendedInstruction extendedInstructions[NO_OF_EXT_INSTRUCTIONS] = 
 	{ "SET 7, (HL)", cb_set_7_hlp, 12}, // 0xfe
 	{ "SET 7, A", cb_set_7_a }      // 0xff
 };
+
+static void rlc(struct gameboy * gameboy, uint8_t * value)
+{
+	int carryBit = ((*value) & 0x80) >> 7;
+	if ((*value) & 0x80){
+		setFlag(gameboy, CARRY, true);
+	}
+	else {
+		setFlag(gameboy, CARRY, false);
+	}
+
+	(*value) <<= 1;
+	(*value) += carryBit;
+
+	if (*value){
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, false);
+
+}
+
+static void rrc(struct gameboy * gameboy, uint8_t * value)
+{
+	int carryBit = *value & 0x01;
+	
+	(*value) >>= 1;	
+
+	if (carryBit){
+		setFlag(gameboy, CARRY, true);
+		(*value) |= 0x80;
+	}
+	else {
+		setFlag(gameboy, CARRY, false);
+	}
+
+	if (*value){
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, false);
+
+}
+
+static void rl(struct gameboy * gameboy, uint8_t * value)
+{
+	int carryBit = isFlagSet(gameboy, CARRY);
+	
+	if ((*value) & 0x80){
+		setFlag(gameboy, CARRY, true);
+	}
+	else {
+		setFlag(gameboy, CARRY, false);
+	}
+
+	(*value) <<= 1;
+	(*value) += carryBit;
+
+	if (*value){
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, false);
+
+}
+
+static void rr(struct gameboy * gameboy, uint8_t * value)
+{
+	(*value) >>= 1;
+	if (isFlagSet(gameboy, CARRY)){
+		(*value) |= 0x80;
+	}
+
+	if ((*value) & 0x01){
+		setFlag(gameboy, CARRY, true);
+	}
+	else {
+		setFlag(gameboy, CARRY, false);
+	}
+
+	if (*value){
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, false);
+
+}
+
+static void sla(struct gameboy * gameboy, uint8_t * value)
+{
+	if ((*value) & 0x80){
+		setFlag(gameboy, CARRY, true);
+	}
+	else {
+		setFlag(gameboy, CARRY, false);
+	}
+
+	(*value) <<= 1;
+
+	if (*value){
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, false);
+
+}
+
+static void sra(struct gameboy * gameboy, uint8_t * value)
+{
+	if ((*value) & 0x01){
+		setFlag(gameboy, CARRY, true);
+	}
+	else {
+		setFlag(gameboy, CARRY, false);
+	}
+
+	uint8_t newValue = (((*value) & 0x80) | ((*value) >> 1));
+	*value = newValue;
+
+	if (*value){
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+	
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, false);
+	
+}
+
+static void swap(struct gameboy * gameboy, uint8_t * value)
+{
+	uint8_t swapped = (((*value) & 0xF) << 4) | (((*value) & 0xF) >> 4);
+	*value = swapped;
+
+	if (*value){
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, false);
+	setFlag(gameboy, CARRY, false);
+}
+
+static void srl(struct gameboy * gameboy, uint8_t * value)
+{
+	if ((*value) & 0x01){
+		setFlag(gameboy, CARRY, true);
+	}
+	else {
+		setFlag(gameboy, CARRY, false);
+	}
+	
+	(*value) >>= 1;
+
+	if (*value){
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, false);
+
+}
+
+//test bit (bit) in register (reg)
+static void testBit(struct gameboy * gameboy, uint8_t bit, uint8_t reg)
+{
+	if (reg & bit){
+		setFlag(gameboy, ZERO, false);
+	}
+	else {
+		setFlag(gameboy, ZERO, true);
+	}
+
+	setFlag(gameboy, SUB, false);
+	setFlag(gameboy, HALF_CARRY, true);
+}
+
+static void setBit(struct gameboy * gameboy, uint8_t bit, uint8_t * reg)
+{
+	(*reg) |= bit;
+}
 
 void executeExtendedOpcode(struct gameboy * gameboy, uint8_t opcode)
 {
