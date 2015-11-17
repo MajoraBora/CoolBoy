@@ -1,19 +1,21 @@
 #include "../include/extops.h"
 #include "../include/gameboy.h"
 #include "../include/flags.h"
+#include "../include/bitUtils.h"
 #include <stdio.h>
 
-static void rlc(struct gameboy * gameboy, uint8_t * value);
-static void rrc(struct gameboy * gameboy, uint8_t * value);
-static void rl(struct gameboy * gameboy, uint8_t * value);
-static void rr(struct gameboy * gameboy, uint8_t * value);
-static void sla(struct gameboy * gameboy, uint8_t * value);
-static void sra(struct gameboy * gameboy, uint8_t * value);
-static void swap(struct gameboy * gameboy, uint8_t * value);
-static void srl(struct gameboy * gameboy, uint8_t * value);
+static void cb_rlc(struct gameboy * gameboy, uint8_t * value);
+static void cb_rrc(struct gameboy * gameboy, uint8_t * value);
+static void cb_rl(struct gameboy * gameboy, uint8_t * value);
+static void cb_rr(struct gameboy * gameboy, uint8_t * value);
+static void cb_sla(struct gameboy * gameboy, uint8_t * value);
+static void cb_sra(struct gameboy * gameboy, uint8_t * value);
+static void cb_swap(struct gameboy * gameboy, uint8_t * value);
+static void cb_srl(struct gameboy * gameboy, uint8_t * value);
 //test bit (bit) in register (reg)
-static void testBit(struct gameboy * gameboy, uint8_t bit, uint8_t reg);
-static void setBit(struct gameboy * gameboy, uint8_t bit, uint8_t * reg);
+static void cb_testBit(struct gameboy * gameboy, uint8_t bit, uint8_t reg);
+static void cb_resetBit(struct gameboy * gameboy, uint8_t bit, uint8_t * reg);
+static void cb_setBit(struct gameboy * gameboy, uint8_t bit, uint8_t * reg);
 
 
 const struct extendedInstruction extendedInstructions[NO_OF_EXT_INSTRUCTIONS] = {
@@ -275,7 +277,7 @@ const struct extendedInstruction extendedInstructions[NO_OF_EXT_INSTRUCTIONS] = 
 	{ "SET 7, A", cb_set_7_a }      // 0xff
 };
 
-static void rlc(struct gameboy * gameboy, uint8_t * value)
+static void cb_rlc(struct gameboy * gameboy, uint8_t * value)
 {
 	int carryBit = ((*value) & 0x80) >> 7;
 	if ((*value) & 0x80){
@@ -300,7 +302,7 @@ static void rlc(struct gameboy * gameboy, uint8_t * value)
 
 }
 
-static void rrc(struct gameboy * gameboy, uint8_t * value)
+static void cb_rrc(struct gameboy * gameboy, uint8_t * value)
 {
 	int carryBit = *value & 0x01;
 	
@@ -326,7 +328,7 @@ static void rrc(struct gameboy * gameboy, uint8_t * value)
 
 }
 
-static void rl(struct gameboy * gameboy, uint8_t * value)
+static void cb_rl(struct gameboy * gameboy, uint8_t * value)
 {
 	int carryBit = isFlagSet(gameboy, CARRY);
 	
@@ -352,7 +354,7 @@ static void rl(struct gameboy * gameboy, uint8_t * value)
 
 }
 
-static void rr(struct gameboy * gameboy, uint8_t * value)
+static void cb_rr(struct gameboy * gameboy, uint8_t * value)
 {
 	(*value) >>= 1;
 	if (isFlagSet(gameboy, CARRY)){
@@ -378,7 +380,7 @@ static void rr(struct gameboy * gameboy, uint8_t * value)
 
 }
 
-static void sla(struct gameboy * gameboy, uint8_t * value)
+static void cb_sla(struct gameboy * gameboy, uint8_t * value)
 {
 	if ((*value) & 0x80){
 		setFlag(gameboy, CARRY, true);
@@ -401,7 +403,7 @@ static void sla(struct gameboy * gameboy, uint8_t * value)
 
 }
 
-static void sra(struct gameboy * gameboy, uint8_t * value)
+static void cb_sra(struct gameboy * gameboy, uint8_t * value)
 {
 	if ((*value) & 0x01){
 		setFlag(gameboy, CARRY, true);
@@ -425,7 +427,7 @@ static void sra(struct gameboy * gameboy, uint8_t * value)
 	
 }
 
-static void swap(struct gameboy * gameboy, uint8_t * value)
+static void cb_swap(struct gameboy * gameboy, uint8_t * value)
 {
 	uint8_t swapped = (((*value) & 0xF) << 4) | (((*value) & 0xF) >> 4);
 	*value = swapped;
@@ -442,7 +444,7 @@ static void swap(struct gameboy * gameboy, uint8_t * value)
 	setFlag(gameboy, CARRY, false);
 }
 
-static void srl(struct gameboy * gameboy, uint8_t * value)
+static void cb_srl(struct gameboy * gameboy, uint8_t * value)
 {
 	if ((*value) & 0x01){
 		setFlag(gameboy, CARRY, true);
@@ -466,7 +468,7 @@ static void srl(struct gameboy * gameboy, uint8_t * value)
 }
 
 //test bit (bit) in register (reg)
-static void testBit(struct gameboy * gameboy, uint8_t bit, uint8_t reg)
+static void cb_testBit(struct gameboy * gameboy, uint8_t bit, uint8_t reg)
 {
 	if (reg & bit){
 		setFlag(gameboy, ZERO, false);
@@ -479,7 +481,12 @@ static void testBit(struct gameboy * gameboy, uint8_t bit, uint8_t reg)
 	setFlag(gameboy, HALF_CARRY, true);
 }
 
-static void setBit(struct gameboy * gameboy, uint8_t bit, uint8_t * reg)
+static void cb_resetBit(struct gameboy * gameboy, uint8_t bit, uint8_t * reg)
+{
+
+}
+
+static void cb_setBit(struct gameboy * gameboy, uint8_t bit, uint8_t * reg)
 {
 	(*reg) |= bit;
 }
@@ -492,641 +499,764 @@ void executeExtendedOpcode(struct gameboy * gameboy, uint8_t opcode)
 
 void cb_rlc_b(struct gameboy * gameboy)
 {
-
+	cb_rlc(gameboy, &gameboy->cpu.b);
 }
 
 void cb_rlc_c(struct gameboy * gameboy)
 {
-
+	cb_rlc(gameboy, &gameboy->cpu.b);
 }
 
 void cb_rlc_d(struct gameboy * gameboy)
 {
+	cb_rlc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rlc_e(struct gameboy * gameboy)
 {
+	cb_rlc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rlc_h(struct gameboy * gameboy)
 {
+	cb_rlc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rlc_l(struct gameboy * gameboy)
 {
+	cb_rlc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rlc_hlp(struct gameboy * gameboy)
 {
+	cb_rlc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rlc_a(struct gameboy * gameboy)
 {
+	cb_rlc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rrc_b(struct gameboy * gameboy)
 {
-
+	cb_rrc(gameboy, &gameboy->cpu.b);
 }
 
 void cb_rrc_c(struct gameboy * gameboy)
 {
+	cb_rrc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rrc_d(struct gameboy * gameboy)
 {
+	cb_rrc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rrc_e(struct gameboy * gameboy)
 {
+	cb_rrc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rrc_h(struct gameboy * gameboy)
 {
+	cb_rrc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rrc_l(struct gameboy * gameboy)
 {
+	cb_rrc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rrc_hlp(struct gameboy * gameboy)
 {
+	cb_rrc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rrc_a(struct gameboy * gameboy)
 {
+	cb_rrc(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rl_b(struct gameboy * gameboy)
 {
+	cb_rl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rl_c(struct gameboy * gameboy)
 {
-
+	cb_rl(gameboy, &gameboy->cpu.b);
 }
 
 void cb_rl_d(struct gameboy * gameboy)
 {
+	cb_rl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rl_e(struct gameboy * gameboy)
 {
+	cb_rl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rl_h(struct gameboy * gameboy)
 {
+	cb_rl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rl_l(struct gameboy * gameboy)
 {
+	cb_rl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rl_hlp(struct gameboy * gameboy)
 {
+	cb_rl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rl_a(struct gameboy * gameboy)
 {
+	cb_rl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rr_b(struct gameboy * gameboy)
 {
+	cb_rr(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rr_c(struct gameboy * gameboy)
 {
+	cb_rr(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rr_d(struct gameboy * gameboy)
 {
+	cb_rr(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rr_e(struct gameboy * gameboy)
 {
+	cb_rr(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rr_h(struct gameboy * gameboy)
 {
+	cb_rr(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rr_l(struct gameboy * gameboy)
 {
+	cb_rr(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rr_hlp(struct gameboy * gameboy)
 {
+	cb_rr(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_rr_a(struct gameboy * gameboy)
 {
+	cb_rr(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sla_b(struct gameboy * gameboy)
 {
+	cb_sla(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sla_c(struct gameboy * gameboy)
 {
+	cb_sla(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sla_d(struct gameboy * gameboy)
 {
+	cb_sla(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sla_e(struct gameboy * gameboy)
 {
+	cb_sla(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sla_h(struct gameboy * gameboy)
 {
 
+	cb_sla(gameboy, &gameboy->cpu.b);
 }
 
 void cb_sla_l(struct gameboy * gameboy)
 {
+	cb_sla(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sla_hlp(struct gameboy * gameboy)
 {
+	cb_sla(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sla_a(struct gameboy * gameboy)
 {
+	cb_sla(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sra_b(struct gameboy * gameboy)
 {
+	cb_sra(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sra_c(struct gameboy * gameboy)
 {
+	cb_sra(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sra_d(struct gameboy * gameboy)
 {
+	cb_sra(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sra_e(struct gameboy * gameboy)
 {
+	cb_sra(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sra_h(struct gameboy * gameboy)
 {
+	cb_sra(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sra_l(struct gameboy * gameboy)
 {
+	cb_sra(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sra_hlp(struct gameboy * gameboy)
 {
+	cb_sra(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_sra_a(struct gameboy * gameboy)
 {
+	cb_sra(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_swap_b(struct gameboy * gameboy)
 {
+	cb_swap(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_swap_c(struct gameboy * gameboy)
 {
+	cb_swap(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_swap_d(struct gameboy * gameboy)
 {
+	cb_swap(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_swap_e(struct gameboy * gameboy)
 {
+	cb_swap(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_swap_h(struct gameboy * gameboy)
 {
+	cb_swap(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_swap_l(struct gameboy * gameboy)
 {
+	cb_swap(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_swap_hlp(struct gameboy * gameboy)
 {
+	cb_swap(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_swap_a(struct gameboy * gameboy)
 {
+	cb_swap(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_srl_b(struct gameboy * gameboy)
 {
+	cb_srl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_srl_c(struct gameboy * gameboy)
 {
+	cb_srl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_srl_d(struct gameboy * gameboy)
 {
+	cb_srl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_srl_e(struct gameboy * gameboy)
 {
+	cb_srl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_srl_h(struct gameboy * gameboy)
 {
+	cb_srl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_srl_l(struct gameboy * gameboy)
 {
+	cb_srl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_srl_hlp(struct gameboy * gameboy)
 {
+	cb_srl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_srl_a(struct gameboy * gameboy)
 {
+	cb_srl(gameboy, &gameboy->cpu.b);
 
 }
 
 void cb_bit_0_b(struct gameboy * gameboy)
 {
-
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 }
 
 void cb_bit_0_c(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_0_d(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_0_e(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_0_h(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_0_l(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_0_hlp(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_0_a(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_1_b(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_1_c(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_1_d(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_1_e(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_1_h(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_1_l(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_1_hlp(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_1_a(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_2_b(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_2_c(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_2_d(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_2_e(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_2_h(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_2_l(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_2_hlp(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_2_a(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_3_b(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_3_c(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_3_d(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_3_e(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_3_h(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_3_l(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_3_hlp(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_3_a(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_4_b(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_4_c(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_4_d(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_4_e(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_4_h(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_4_l(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_4_hlp(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_4_a(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_5_b(struct gameboy * gameboy)
 {
 
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 }
 
 void cb_bit_5_c(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_5_d(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_5_e(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_5_h(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_5_l(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_5_hlp(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_5_a(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_6_b(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_6_c(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_6_d(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_6_e(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_6_h(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_6_l(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_6_hlp(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_6_a(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_7_b(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_7_c(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_7_d(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_7_e(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_7_h(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_7_l(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_7_hlp(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
 void cb_bit_7_a(struct gameboy * gameboy)
 {
+	cb_testBit(gameboy, 0, gameboy->cpu.b);
 
 }
 
