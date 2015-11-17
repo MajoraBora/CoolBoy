@@ -9,7 +9,6 @@
 #include "../include/timer.h"
 #include "../include/bitUtils.h"
 #include "../include/extops.h"
-
 #include "../include/interrupt.h"
 
 int main(void)
@@ -18,11 +17,7 @@ int main(void)
 	struct gameboy * gameboy;
 	gameboy = createGameboy();
 
-	loadGame(gameboy, "../games/tetris.gb");
-	for (int i = 0; i < 0x100; i++){
-		executeExtendedOpcode(gameboy, i);
-	}
-	//startEmulationLoop(gameboy);
+	startEmulationLoop(gameboy);
 
 	return 0;
 
