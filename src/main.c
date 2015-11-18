@@ -16,12 +16,9 @@ int main(void)
 	
 	struct gameboy * gameboy;
 	gameboy = createGameboy();
+	loadGame(gameboy, "../games/tetris.gb");
 
-	//startEmulationLoop(gameboy);
-	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
-	printf("%d, %d\n", gameboy->cpu.hl, byte);
-	cb_rlc_hlp(gameboy);
-	
+	startEmulationLoop(gameboy);
 
 	return 0;
 

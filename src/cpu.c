@@ -582,6 +582,7 @@ uint8_t executeNextOpcode(struct gameboy * gameboy)
 		{
 			//1 operand, get byte
 			uint8_t byte = readByte(gameboy, gameboy->cpu.pc);
+			++gameboy->cpu.pc;
 			printf("arg: %x\n", byte);
 			((void(*)(struct gameboy *, uint8_t))instruction.function)(gameboy, byte);
 			break;
@@ -589,12 +590,12 @@ uint8_t executeNextOpcode(struct gameboy * gameboy)
 		case 2:
 		{
 			uint16_t word = readWord(gameboy, gameboy->cpu.pc);
+			gameboy->cpu.pc += 2;
 			printf("arg: %x\n", word);
 			((void(*)(struct gameboy *, uint16_t))instruction.function)(gameboy, word);
 			break;
 		}
 	}
-	//gameboy->cpu.pc += instruction.operandLength; //might be the right place?
 
 	return instruction.cycles;
 }
