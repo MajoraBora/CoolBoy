@@ -533,7 +533,9 @@ void cb_rlc_l(struct gameboy * gameboy)
 
 void cb_rlc_hlp(struct gameboy * gameboy)
 {
-	cb_rlc(gameboy, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_rlc(gameboy, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
@@ -580,7 +582,9 @@ void cb_rrc_l(struct gameboy * gameboy)
 
 void cb_rrc_hlp(struct gameboy * gameboy)
 {
-	cb_rrc(gameboy, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_rrc(gameboy, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
@@ -627,7 +631,9 @@ void cb_rl_l(struct gameboy * gameboy)
 
 void cb_rl_hlp(struct gameboy * gameboy)
 {
-	cb_rl(gameboy, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_rl(gameboy, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
@@ -675,7 +681,9 @@ void cb_rr_l(struct gameboy * gameboy)
 
 void cb_rr_hlp(struct gameboy * gameboy)
 {
-	cb_rr(gameboy, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_rr(gameboy, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
@@ -723,7 +731,9 @@ void cb_sla_l(struct gameboy * gameboy)
 
 void cb_sla_hlp(struct gameboy * gameboy)
 {
-	cb_sla(gameboy, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_sla(gameboy, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
@@ -771,7 +781,9 @@ void cb_sra_l(struct gameboy * gameboy)
 
 void cb_sra_hlp(struct gameboy * gameboy)
 {
-	cb_sra(gameboy, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_sra(gameboy, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
@@ -819,7 +831,9 @@ void cb_swap_l(struct gameboy * gameboy)
 
 void cb_swap_hlp(struct gameboy * gameboy)
 {
-	cb_swap(gameboy, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_swap(gameboy, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
@@ -867,7 +881,9 @@ void cb_srl_l(struct gameboy * gameboy)
 
 void cb_srl_hlp(struct gameboy * gameboy)
 {
-	cb_srl(gameboy, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_srl(gameboy, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
@@ -914,7 +930,8 @@ void cb_bit_0_l(struct gameboy * gameboy)
 
 void cb_bit_0_hlp(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_testBit(gameboy, 0, byte);
 
 }
 
@@ -926,289 +943,295 @@ void cb_bit_0_a(struct gameboy * gameboy)
 
 void cb_bit_1_b(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	cb_testBit(gameboy, 1, gameboy->cpu.b);
 
 }
 
 void cb_bit_1_c(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.c);
+	cb_testBit(gameboy, 1, gameboy->cpu.c);
 
 }
 
 void cb_bit_1_d(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.d);
+	cb_testBit(gameboy, 1, gameboy->cpu.d);
 
 }
 
 void cb_bit_1_e(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.e);
+	cb_testBit(gameboy, 1, gameboy->cpu.e);
 
 }
 
 void cb_bit_1_h(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.h);
+	cb_testBit(gameboy, 1, gameboy->cpu.h);
 
 }
 
 void cb_bit_1_l(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.l);
+	cb_testBit(gameboy, 1, gameboy->cpu.l);
 
 }
 
 void cb_bit_1_hlp(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_testBit(gameboy, 1, byte);
 
 }
 
 void cb_bit_1_a(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.a);
+	cb_testBit(gameboy, 1, gameboy->cpu.a);
 
 }
 
 void cb_bit_2_b(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	cb_testBit(gameboy, 2, gameboy->cpu.b);
 
 }
 
 void cb_bit_2_c(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.c);
+	cb_testBit(gameboy, 2, gameboy->cpu.c);
 
 }
 
 void cb_bit_2_d(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.d);
+	cb_testBit(gameboy, 2, gameboy->cpu.d);
 
 }
 
 void cb_bit_2_e(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.e);
+	cb_testBit(gameboy, 2, gameboy->cpu.e);
 
 }
 
 void cb_bit_2_h(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.h);
+	cb_testBit(gameboy, 2, gameboy->cpu.h);
 
 }
 
 void cb_bit_2_l(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.l);
+	cb_testBit(gameboy, 2, gameboy->cpu.l);
 
 }
 
 void cb_bit_2_hlp(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_testBit(gameboy, 2, byte);
 
 }
 
 void cb_bit_2_a(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.a);
+	cb_testBit(gameboy, 2, gameboy->cpu.a);
 
 }
 
 void cb_bit_3_b(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	cb_testBit(gameboy, 3, gameboy->cpu.b);
 
 }
 
 void cb_bit_3_c(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.c);
+	cb_testBit(gameboy, 3, gameboy->cpu.c);
 
 }
 
 void cb_bit_3_d(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.d);
+	cb_testBit(gameboy, 3, gameboy->cpu.d);
 
 }
 
 void cb_bit_3_e(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.e);
+	cb_testBit(gameboy, 3, gameboy->cpu.e);
 
 }
 
 void cb_bit_3_h(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.h);
+	cb_testBit(gameboy, 3, gameboy->cpu.h);
 
 }
 
 void cb_bit_3_l(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.l);
+	cb_testBit(gameboy, 3, gameboy->cpu.l);
 
 }
 
 void cb_bit_3_hlp(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_testBit(gameboy, 3, byte);
 
 }
 
 void cb_bit_3_a(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.a);
+	cb_testBit(gameboy, 3, gameboy->cpu.a);
 
 }
 
 void cb_bit_4_b(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	cb_testBit(gameboy, 4, gameboy->cpu.b);
 
 }
 
 void cb_bit_4_c(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.c);
+	cb_testBit(gameboy, 4, gameboy->cpu.c);
 
 }
 
 void cb_bit_4_d(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.d);
+	cb_testBit(gameboy, 4, gameboy->cpu.d);
 
 }
 
 void cb_bit_4_e(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.e);
+	cb_testBit(gameboy, 4, gameboy->cpu.e);
 
 }
 
 void cb_bit_4_h(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.h);
+	cb_testBit(gameboy, 4, gameboy->cpu.h);
 
 }
 
 void cb_bit_4_l(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.l);
+	cb_testBit(gameboy, 4, gameboy->cpu.l);
 
 }
 
 void cb_bit_4_hlp(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_testBit(gameboy, 4, byte);
 
 }
 
 void cb_bit_4_a(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.a);
+	cb_testBit(gameboy, 4, gameboy->cpu.a);
 
 }
 
 void cb_bit_5_b(struct gameboy * gameboy)
 {
 
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	cb_testBit(gameboy, 5, gameboy->cpu.b);
 }
 
 void cb_bit_5_c(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.c);
+	cb_testBit(gameboy, 5, gameboy->cpu.c);
 
 }
 
 void cb_bit_5_d(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.d);
+	cb_testBit(gameboy, 5, gameboy->cpu.d);
 
 }
 
 void cb_bit_5_e(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.e);
+	cb_testBit(gameboy, 5, gameboy->cpu.e);
 
 }
 
 void cb_bit_5_h(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.h);
+	cb_testBit(gameboy, 5, gameboy->cpu.h);
 
 }
 
 void cb_bit_5_l(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.l);
+	cb_testBit(gameboy, 5, gameboy->cpu.l);
 
 }
 
 void cb_bit_5_hlp(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_testBit(gameboy, 5, byte);
 
 }
 
 void cb_bit_5_a(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.a);
+	cb_testBit(gameboy, 5, gameboy->cpu.a);
 
 }
 
 void cb_bit_6_b(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	cb_testBit(gameboy, 6, gameboy->cpu.b);
 
 }
 
 void cb_bit_6_c(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.c);
+	cb_testBit(gameboy, 6, gameboy->cpu.c);
 
 }
 
 void cb_bit_6_d(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.d);
+	cb_testBit(gameboy, 6, gameboy->cpu.d);
 
 }
 
 void cb_bit_6_e(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.e);
+	cb_testBit(gameboy, 6, gameboy->cpu.e);
 
 }
 
 void cb_bit_6_h(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.h);
+	cb_testBit(gameboy, 6, gameboy->cpu.h);
 
 }
 
 void cb_bit_6_l(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.l);
+	cb_testBit(gameboy, 6, gameboy->cpu.l);
 
 }
 
 void cb_bit_6_hlp(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_testBit(gameboy, 6, byte);
 
 }
 
 void cb_bit_6_a(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.a);
+	cb_testBit(gameboy, 6, gameboy->cpu.a);
 
 }
 
@@ -1220,43 +1243,44 @@ void cb_bit_7_b(struct gameboy * gameboy)
 
 void cb_bit_7_c(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.c);
+	cb_testBit(gameboy, 7, gameboy->cpu.c);
 
 }
 
 void cb_bit_7_d(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.d);
+	cb_testBit(gameboy, 7, gameboy->cpu.d);
 
 }
 
 void cb_bit_7_e(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.e);
+	cb_testBit(gameboy, 7, gameboy->cpu.e);
 
 }
 
 void cb_bit_7_h(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.h);
+	cb_testBit(gameboy, 7, gameboy->cpu.h);
 
 }
 
 void cb_bit_7_l(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.l);
+	cb_testBit(gameboy, 7, gameboy->cpu.l);
 
 }
 
 void cb_bit_7_hlp(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_testBit(gameboy, 7, byte);
 
 }
 
 void cb_bit_7_a(struct gameboy * gameboy)
 {
-	cb_testBit(gameboy, 0, gameboy->cpu.a);
+	cb_testBit(gameboy, 7, gameboy->cpu.a);
 
 }
 
@@ -1267,379 +1291,395 @@ void cb_res_0_b(struct gameboy * gameboy)
 
 void cb_res_0_c(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 0, &gameboy->cpu.c);
 
 }
 
 void cb_res_0_d(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 0, &gameboy->cpu.d);
 
 }
 
 void cb_res_0_e(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 0, &gameboy->cpu.e);
 
 }
 
 void cb_res_0_h(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 0, &gameboy->cpu.h);
 
 }
 
 void cb_res_0_l(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 0, &gameboy->cpu.l);
 
 }
 
 void cb_res_0_hlp(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_resetBit(gameboy, 0, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_res_0_a(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 0, &gameboy->cpu.a);
 
 }
 
 void cb_res_1_b(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 1, &gameboy->cpu.b);
 
 }
 
 void cb_res_1_c(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 1, &gameboy->cpu.c);
 
 }
 
 void cb_res_1_d(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 1, &gameboy->cpu.d);
 
 }
 
 void cb_res_1_e(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 1, &gameboy->cpu.e);
 
 }
 
 void cb_res_1_h(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 1, &gameboy->cpu.h);
 
 }
 
 void cb_res_1_l(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 1, &gameboy->cpu.l);
 
 }
 
 void cb_res_1_hlp(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_resetBit(gameboy, 1, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_res_1_a(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 1, &gameboy->cpu.a);
 
 }
 
 void cb_res_2_b(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 2, &gameboy->cpu.b);
 
 }
 
 void cb_res_2_c(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 2, &gameboy->cpu.c);
 
 }
 
 void cb_res_2_d(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 2, &gameboy->cpu.d);
 
 }
 
 void cb_res_2_e(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 2, &gameboy->cpu.e);
 
 }
 
 void cb_res_2_h(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 2, &gameboy->cpu.h);
 
 }
 
 void cb_res_2_l(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 2, &gameboy->cpu.l);
 
 }
 
 void cb_res_2_hlp(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_resetBit(gameboy, 2, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_res_2_a(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 2, &gameboy->cpu.a);
 
 }
 
 void cb_res_3_b(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 3, &gameboy->cpu.b);
 
 }
 
 void cb_res_3_c(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 3, &gameboy->cpu.c);
 
 }
 
 void cb_res_3_d(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 3, &gameboy->cpu.d);
 
 }
 
 void cb_res_3_e(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 3, &gameboy->cpu.e);
 
 }
 
 void cb_res_3_h(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 3, &gameboy->cpu.h);
 
 }
 
 void cb_res_3_l(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 3, &gameboy->cpu.l);
 
 }
 
 void cb_res_3_hlp(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_resetBit(gameboy, 3, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_res_3_a(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 3, &gameboy->cpu.a);
 
 }
 
 void cb_res_4_b(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 4, &gameboy->cpu.b);
 
 }
 
 void cb_res_4_c(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 4, &gameboy->cpu.c);
 
 }
 
 void cb_res_4_d(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 4, &gameboy->cpu.d);
 
 }
 
 void cb_res_4_e(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 4, &gameboy->cpu.e);
 
 }
 
 void cb_res_4_h(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 4, &gameboy->cpu.h);
 
 }
 
 void cb_res_4_l(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 4, &gameboy->cpu.l);
 
 }
 
 void cb_res_4_hlp(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_resetBit(gameboy, 4, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_res_4_a(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 4, &gameboy->cpu.a);
 
 }
 
 void cb_res_5_b(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 5, &gameboy->cpu.b);
 
 }
 
 void cb_res_5_c(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 5, &gameboy->cpu.c);
 
 }
 
 void cb_res_5_d(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 5, &gameboy->cpu.d);
 
 }
 
 void cb_res_5_e(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 5, &gameboy->cpu.e);
 
 }
 
 void cb_res_5_h(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 5, &gameboy->cpu.h);
 
 }
 
 void cb_res_5_l(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 5, &gameboy->cpu.l);
 
 }
 
 void cb_res_5_hlp(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_resetBit(gameboy, 5, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_res_5_a(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 5, &gameboy->cpu.a);
 
 }
 
 void cb_res_6_b(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 6, &gameboy->cpu.b);
 
 }
 
 void cb_res_6_c(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 6, &gameboy->cpu.c);
 
 }
 
 void cb_res_6_d(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 6, &gameboy->cpu.d);
 
 }
 
 void cb_res_6_e(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 6, &gameboy->cpu.e);
 
 }
 
 void cb_res_6_h(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 6, &gameboy->cpu.h);
 
 }
 
 void cb_res_6_l(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 6, &gameboy->cpu.l);
 
 }
 
 void cb_res_6_hlp(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_resetBit(gameboy, 6, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_res_6_a(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 6, &gameboy->cpu.a);
 
 }
 
 void cb_res_7_b(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 7, &gameboy->cpu.b);
 
 }
 
 void cb_res_7_c(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 7, &gameboy->cpu.c);
 
 }
 
 void cb_res_7_d(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 7, &gameboy->cpu.d);
 
 }
 
 void cb_res_7_e(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 7, &gameboy->cpu.e);
 
 }
 
 void cb_res_7_h(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 7, &gameboy->cpu.h);
 
 }
 
 void cb_res_7_l(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 7, &gameboy->cpu.l);
 
 }
 
 void cb_res_7_hlp(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_resetBit(gameboy, 7, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_res_7_a(struct gameboy * gameboy)
 {
-	cb_resetBit(gameboy, 0, &gameboy->cpu.b);
+	cb_resetBit(gameboy, 7, &gameboy->cpu.a);
 
 }
 
@@ -1650,379 +1690,395 @@ void cb_set_0_b(struct gameboy * gameboy)
 
 void cb_set_0_c(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 0, &gameboy->cpu.c);
 
 }
 
 void cb_set_0_d(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 0, &gameboy->cpu.d);
 
 }
 
 void cb_set_0_e(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 0, &gameboy->cpu.e);
 
 }
 
 void cb_set_0_h(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 0, &gameboy->cpu.h);
 
 }
 
 void cb_set_0_l(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 0, &gameboy->cpu.l);
 
 }
 
 void cb_set_0_hlp(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_setBit(gameboy, 0, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_set_0_a(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 0, &gameboy->cpu.a);
 
 }
 
 void cb_set_1_b(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 1, &gameboy->cpu.b);
 
 }
 
 void cb_set_1_c(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 1, &gameboy->cpu.c);
 
 }
 
 void cb_set_1_d(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 1, &gameboy->cpu.d);
 
 }
 
 void cb_set_1_e(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 1, &gameboy->cpu.e);
 
 }
 
 void cb_set_1_h(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 1, &gameboy->cpu.h);
 
 }
 
 void cb_set_1_l(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 1, &gameboy->cpu.l);
 
 }
 
 void cb_set_1_hlp(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_setBit(gameboy, 1, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_set_1_a(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 1, &gameboy->cpu.a);
 
 }
 
 void cb_set_2_b(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 2, &gameboy->cpu.b);
 
 }
 
 void cb_set_2_c(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 2, &gameboy->cpu.c);
 
 }
 
 void cb_set_2_d(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 2, &gameboy->cpu.d);
 
 }
 
 void cb_set_2_e(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 2, &gameboy->cpu.e);
 
 }
 
 void cb_set_2_h(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 2, &gameboy->cpu.h);
 
 }
 
 void cb_set_2_l(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 2, &gameboy->cpu.l);
 
 }
 
 void cb_set_2_hlp(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_setBit(gameboy, 2, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_set_2_a(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 2, &gameboy->cpu.a);
 
 }
 
 void cb_set_3_b(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 3, &gameboy->cpu.b);
 
 }
 
 void cb_set_3_c(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 3, &gameboy->cpu.c);
 
 }
 
 void cb_set_3_d(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 3, &gameboy->cpu.d);
 
 }
 
 void cb_set_3_e(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 3, &gameboy->cpu.e);
 
 }
 
 void cb_set_3_h(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 3, &gameboy->cpu.h);
 
 }
 
 void cb_set_3_l(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 3, &gameboy->cpu.l);
 
 }
 
 void cb_set_3_hlp(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_setBit(gameboy, 3, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_set_3_a(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 3, &gameboy->cpu.a);
 
 }
 
 void cb_set_4_b(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 4, &gameboy->cpu.b);
 
 }
 
 void cb_set_4_c(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 4, &gameboy->cpu.c);
 
 }
 
 void cb_set_4_d(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 4, &gameboy->cpu.d);
 
 }
 
 void cb_set_4_e(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 4, &gameboy->cpu.e);
 
 }
 
 void cb_set_4_h(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 4, &gameboy->cpu.h);
 
 }
 
 void cb_set_4_l(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 4, &gameboy->cpu.l);
 
 }
 
 void cb_set_4_hlp(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_setBit(gameboy, 4, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_set_4_a(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 4, &gameboy->cpu.a);
 
 }
 
 void cb_set_5_b(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 5, &gameboy->cpu.b);
 
 }
 
 void cb_set_5_c(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 5, &gameboy->cpu.c);
 
 }
 
 void cb_set_5_d(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 5, &gameboy->cpu.d);
 
 }
 
 void cb_set_5_e(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 5, &gameboy->cpu.e);
 
 }
 
 void cb_set_5_h(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 5, &gameboy->cpu.h);
 
 }
 
 void cb_set_5_l(struct gameboy * gameboy)
 {
 
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 5, &gameboy->cpu.l);
 }
 
 void cb_set_5_hlp(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_setBit(gameboy, 5, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_set_5_a(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 5, &gameboy->cpu.a);
 
 }
 
 void cb_set_6_b(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 6, &gameboy->cpu.b);
 
 }
 
 void cb_set_6_c(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 6, &gameboy->cpu.c);
 
 }
 
 void cb_set_6_d(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 6, &gameboy->cpu.d);
 
 }
 
 void cb_set_6_e(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 6, &gameboy->cpu.e);
 
 }
 
 void cb_set_6_h(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 6, &gameboy->cpu.h);
 
 }
 
 void cb_set_6_l(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 6, &gameboy->cpu.l);
 
 }
 
 void cb_set_6_hlp(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_setBit(gameboy, 6, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_set_6_a(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 6, &gameboy->cpu.a);
 
 }
 
 void cb_set_7_b(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 7, &gameboy->cpu.b);
 
 }
 
 void cb_set_7_c(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 7, &gameboy->cpu.c);
 
 }
 
 void cb_set_7_d(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 7, &gameboy->cpu.d);
 
 }
 
 void cb_set_7_e(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 7, &gameboy->cpu.e);
 
 }
 
 void cb_set_7_h(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 7, &gameboy->cpu.h);
 
 }
 
 void cb_set_7_l(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 7, &gameboy->cpu.l);
 
 }
 
 void cb_set_7_hlp(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	uint8_t byte = readByte(gameboy, gameboy->cpu.hl);
+	cb_setBit(gameboy, 7, &byte);
+	writeByte(gameboy, gameboy->cpu.hl, byte);
 
 }
 
 void cb_set_7_a(struct gameboy * gameboy)
 {
-	cb_setBit(gameboy, 0, &gameboy->cpu.b);
+	cb_setBit(gameboy, 7, &gameboy->cpu.a);
 
 }
 
