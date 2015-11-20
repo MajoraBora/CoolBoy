@@ -30,8 +30,9 @@ void startEmulationLoop(struct gameboy * gameboy)
 	//execute instruction
 
 	for (int i = 0; i >= 0; i++){
-		uint8_t cycles = executeNextOpcode(gameboy);
-		printf("%d\n", cycles);
+		executeNextOpcode(gameboy);
+		serviceInterrupts(gameboy);
+		
 	}
 	//increment things
 }

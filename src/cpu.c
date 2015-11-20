@@ -563,7 +563,7 @@ static void compareWithRegA(struct gameboy * gameboy, uint8_t value)
 	setFlag(gameboy, SUB, true);
 }
 
-uint8_t executeNextOpcode(struct gameboy * gameboy)
+void executeNextOpcode(struct gameboy * gameboy)
 {
 	//need to put game into main memory, sort out memory banks etc
 	uint8_t opcode = readByte(gameboy, gameboy->cpu.pc);
@@ -583,7 +583,7 @@ uint8_t executeNextOpcode(struct gameboy * gameboy)
 			//1 operand, get byte
 			uint8_t byte = readByte(gameboy, gameboy->cpu.pc);
 			++gameboy->cpu.pc;
-			printf("arg: %x\n", byte);
+			//printf("arg: %x\n", byte);
 			((void(*)(struct gameboy *, uint8_t))instruction.function)(gameboy, byte);
 			break;
 		}
@@ -591,13 +591,19 @@ uint8_t executeNextOpcode(struct gameboy * gameboy)
 		{
 			uint16_t word = readWord(gameboy, gameboy->cpu.pc);
 			gameboy->cpu.pc += 2;
-			printf("arg: %x\n", word);
+			//printf("arg: %x\n", word);
 			((void(*)(struct gameboy *, uint16_t))instruction.function)(gameboy, word);
 			break;
 		}
 	}
 
-	return instruction.cycles;
+	if (opcode != 0xCB){
+		//if opcode wasn't extended, add cycles
+		gameboy->cpu.cycles += instruction.cycles;
+	}
+	//extended opcode have their own cycle counts, which is sorted inside the 
+	//extops module
+	//printf("%d\n", gameboy->cpu.cycles);
 }
 
 void nop(struct gameboy * gameboy)

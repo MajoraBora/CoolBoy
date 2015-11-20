@@ -494,6 +494,12 @@ static void cb_setBit(struct gameboy * gameboy, uint8_t bit, uint8_t * reg)
 void executeExtendedOpcode(struct gameboy * gameboy, uint8_t opcode)
 {
 	struct extendedInstruction instruction = extendedInstructions[opcode];
+	uint8_t cycles = instruction.cycles;
+	
+	((void(*)(struct gameboy *))instruction.function)(gameboy); //do instruction
+
+	gameboy->cpu.cycles += cycles;
+
 	printf("extended op: %s\n", instruction.instruction);
 }
 
