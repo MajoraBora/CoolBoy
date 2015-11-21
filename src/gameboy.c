@@ -3,9 +3,11 @@
 #include <string.h>
 #include "../include/gameboy.h"
 #include "../include/registers.h"
+#include "../include/joypad.h"
 
 static void initialiseCPU(struct gameboy * gameboy);
 static void initialiseMemory(struct gameboy * gameboy);
+static void initialiseControls(struct gameboy * gameboy);
 
 struct gameboy * createGameboy()
 {
@@ -41,6 +43,7 @@ void reset(struct gameboy * gameboy)
 {
 	initialiseCPU(gameboy);
 	initialiseMemory(gameboy);
+	initialiseControls(gameboy);
 }
 
 static void initialiseCPU(struct gameboy * gameboy)
@@ -99,6 +102,11 @@ static void initialiseMemory(struct gameboy * gameboy)
 
 	printf("done\n");
 
+}
+
+static void initialiseControls(struct gameboy * gameboy)
+{
+	gameboy->joypad.state = malloc(sizeof(int) * NO_OF_BUTTONS); //calloc with 1?
 }
 
 void destroyGameboy(struct gameboy * gameboy)

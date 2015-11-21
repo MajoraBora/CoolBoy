@@ -6,6 +6,7 @@
 #include "timer.h"
 #include "interrupt.h"
 #include "lcd.h"
+#include "joypad.h"
 
 struct gameboy {
 	struct cpu cpu;
@@ -14,6 +15,7 @@ struct gameboy {
 	struct timers timers;
 	struct interrupts interrupts;
 	struct screen screen;
+	struct joypad joypad;
 	//have an error code field - if an error occurs, set it, exit the emu loop, 
 	//then let the calling scope extract and handle it
 	//struct error error;

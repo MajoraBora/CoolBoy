@@ -10,6 +10,7 @@
 #include "../include/bitUtils.h"
 #include "../include/extops.h"
 #include "../include/interrupt.h"
+#include "../include/joypad.h"
 
 int main(void)
 {
@@ -18,7 +19,10 @@ int main(void)
 	gameboy = createGameboy();
 	loadGame(gameboy, "../games/tetris.gb");
 
-	startEmulationLoop(gameboy);
+	//startEmulationLoop(gameboy);
+	
+	startKeyModule(gameboy);
+
 
 	return 0;
 
