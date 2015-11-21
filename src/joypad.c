@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 struct buttonMap buttons[NO_OF_BUTTONS] = {
-	{UP, SDLK_w},
+	{UP, SDLK_w}, 
 	{DOWN, SDLK_s},
 	{LEFT, SDLK_a},
 	{RIGHT, SDLK_d},
@@ -54,8 +54,9 @@ void startKeyModule(struct gameboy * gameboy)
 				continue;
 			}
 
-			if (event.type == SDL_KEYUP || event.type == SDL_KEYDOWN){
-
+			if (event.type == SDL_KEYUP){
+				printf("%d\n", buttons[0].sdlKey);
+				printf("%d\n", SDLK_w);
 				updateJoypadState(gameboy, keys);
 			}
 
@@ -99,11 +100,14 @@ void startKeyModule(struct gameboy * gameboy)
 void updateJoypadState(struct gameboy * gameboy, Uint8 * keys)
 {
 
-	printf("%d\n", keys[SDLK_SPACE]);
 	for (int i = 0; i < NO_OF_BUTTONS; i++){
 		struct buttonMap currentButton = buttons[i];
+		printf("%d ", gameboy->joypad.state[i]);
 		gameboy->joypad.state[currentButton.button] = keys[currentButton.sdlKey];
 	}
+
+	printf("\n");
+
 
 }
 

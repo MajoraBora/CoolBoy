@@ -34,8 +34,8 @@ enum button {
 };
 
 struct buttonMap {
-	SDLKey sdlKey;
 	enum button button;
+	SDLKey sdlKey;
 };
 
 struct joypad {
