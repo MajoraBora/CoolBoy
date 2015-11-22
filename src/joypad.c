@@ -1,5 +1,6 @@
 #include "../include/joypad.h"
 #include "../include/gameboy.h"
+#include "../include/bitUtils.h"
 #include <SDL/SDL.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,6 +16,8 @@ struct buttonMap buttons[NO_OF_BUTTONS] = {
 	{SELECT, SDLK_SPACE}
 	
 };
+
+static bool interruptableStateChanged(uint8_t prev, uint8_t cur);
 
 void handleKeys(SDL_Event * event, int * quit)
 {
@@ -73,11 +76,28 @@ void updateJoypadState(struct gameboy * gameboy, Uint8 * keys)
 	of the joypad. (codeslinger)
 	*/
 
+	/*
+	Maintain an 8 bit int, emulating the joypad register at 0xFF00
+	
+	maintain 8 bit int, where each bit represents the state of a button - initialise all to 1
+	
+	
+	*/
+
 	for (int i = 0; i < NO_OF_BUTTONS; i++){
-		struct buttonMap currentButton = buttons[i];
-		printf("%d ", gameboy->joypad.state[i]);
-		gameboy->joypad.previousState[currentButton.button] = gameboy->joypad.state[currentButton.button];
-		gameboy->joypad.state[currentButton.button] = keys[currentButton.sdlKey];
+		struct buttonMap currentButton = buttons[i]; //{button, mapped sdl button}
+		enum button buttonIndex = currentButton.button;
+		SDLKey sdlKeyIndex = currentButton.sdlKey;
+
+		uint8_t previousState = getBit(gameboy->joypad.buttonState, buttonIndex);
+		uint8_t currentState = !keys[sdlKeyIndex]; //keys sets value to 1 when pressed, reverse this for gameboy
+
+		setBit(&gameboy->joypad.buttonState, buttonIndex, currentState); 
+		printf("%d ", currentState);
+
+		if (interruptableStateChanged(previousState, currentState)){
+			printf("interrupt %d if possible\n", i);
+		}
 	
 		if (gameboy->joypad.state[currentButton.button] == 1 && gameboy->joypad.previousState[currentButton.button] == 0){
 			if (currentButton.button < RIGHT && gameboy->joypad.buttonMode){
@@ -98,3 +118,7 @@ void updateJoypadState(struct gameboy * gameboy, Uint8 * keys)
 
 }
 
+static bool interruptableStateChanged(uint8_t prev, uint8_t cur)
+{
+	return (prev == 1) && (cur == 0);
+}

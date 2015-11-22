@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #define JOYPAD_REG 0xFF00
+#define JOYPAD_REG_INIT 0xF
 #define NO_OF_BUTTONS 8
 
 struct gameboy;
@@ -41,6 +42,8 @@ struct buttonMap {
 struct joypad {
 	uint8_t * state; //0xFF00
 	uint8_t * previousState;
+	uint8_t reg;
+	uint8_t buttonState;
 	bool buttonMode; //0 for directions, 1 for buttons
 	/*
 	bool up;
