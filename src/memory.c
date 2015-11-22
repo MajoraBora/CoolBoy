@@ -1,6 +1,7 @@
 #include "../include/memory.h"
 #include "../include/gameboy.h"
 #include "../include/dma.h"
+#include "../include/joypad.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -174,6 +175,11 @@ uint8_t readByte(struct gameboy * gameboy, uint16_t address)
 	else if (address == CURRENT_SCANLINE){
 		//any reads from currentscanline reset it
 		gameboy->screen.currentScanline = 0;
+	}
+	else if (address == JOYPAD_REG){
+		//look at data in memory address JOYPAD_REG (0xFF00)
+		//see if the game is interested in directional or standard buttons
+		//set joypad state as necessary
 	}
 
 	return gameboy->memory.mem[address];

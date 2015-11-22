@@ -63,16 +63,33 @@ void startKeyModule(struct gameboy * gameboy)
 
 void updateJoypadState(struct gameboy * gameboy, Uint8 * keys)
 {
+	//if a key is pressed, its value in the register is 0, not 1
+
+	/*
+	Whenever the game reads from 0xFF00 i trap it with ReadMemory and call a 
+	function which looks at memory address 0xFF00 to see if the game is interest 
+	in directional buttons or standard buttons and then I return a byte data 
+	which combines m_JoypadState with 0xFF00 so the game gets the correct state 
+	of the joypad. (codeslinger)
+	*/
 
 	for (int i = 0; i < NO_OF_BUTTONS; i++){
 		struct buttonMap currentButton = buttons[i];
 		printf("%d ", gameboy->joypad.state[i]);
 		gameboy->joypad.previousState[currentButton.button] = gameboy->joypad.state[currentButton.button];
 		gameboy->joypad.state[currentButton.button] = keys[currentButton.sdlKey];
-
-		if (gameboy->joypad.state[currentButton.button] == 0 && gameboy->joypad.previousState[currentButton.button] == 1){
-			//fire interrupt
-			printf("interrupt\n");
+	
+		if (gameboy->joypad.state[currentButton.button] == 1 && gameboy->joypad.previousState[currentButton.button] == 0){
+			if (currentButton.button < RIGHT && gameboy->joypad.buttonMode){
+				//if current active button is non-directional and button mode is active
+				//fire interrupt
+				printf("button interrupt\n");
+			}
+			else if (currentButton.button >= RIGHT && !gameboy->joypad.buttonMode){
+				//if current active button is directional and directional mode is active
+				//fire interrupt
+				printf("directional interrupt\n");
+			}
 		}
 	}
 
