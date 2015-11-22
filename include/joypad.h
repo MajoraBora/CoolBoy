@@ -40,7 +40,7 @@ struct buttonMap {
 
 struct joypad {
 	uint8_t * state; //0xFF00
-	uint8_t previousState;
+	uint8_t * previousState;
 	bool buttonMode; //0 for directions, 1 for buttons
 	/*
 	bool up;

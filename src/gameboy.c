@@ -107,6 +107,7 @@ static void initialiseMemory(struct gameboy * gameboy)
 static void initialiseControls(struct gameboy * gameboy)
 {
 	gameboy->joypad.state = malloc(sizeof(int) * NO_OF_BUTTONS); //calloc with 1?
+	gameboy->joypad.previousState = malloc(sizeof(int) * NO_OF_BUTTONS); //calloc with 1?
 }
 
 void destroyGameboy(struct gameboy * gameboy)

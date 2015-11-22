@@ -43,7 +43,6 @@ void startKeyModule(struct gameboy * gameboy)
 	}
 
 	SDL_EnableUNICODE(1);
-	//SDL_EnableKeyRepeat(0, 40);
 
 	while(!quit){
 		while(SDL_PollEvent(&event)){
@@ -54,45 +53,10 @@ void startKeyModule(struct gameboy * gameboy)
 				continue;
 			}
 
-			if (event.type == SDL_KEYUP){
-				printf("%d\n", buttons[0].sdlKey);
-				printf("%d\n", SDLK_w);
+			if (event.type == SDL_KEYUP || event.type == SDL_KEYDOWN){
 				updateJoypadState(gameboy, keys);
 			}
 
-			/*
-			switch(event.type){
-				case SDL_KEYDOWN:
-				break;
-				case SDL_KEYUP:
-				break;
-			}
-			if (keys[SDLK_ESCAPE]){
-				quit = 1;
-			}
-	
-			if (keys[SDLK_i]){
-				printf("A Button pressed.\n");
-			}
-
-			if (keys[SDLK_j]){
-				printf("B Button pressed.\n");
-			}
-
-			if (keys[SDLK_w]){
-				printf("UP pressed\n");
-			}
-			else if (keys[SDLK_s]){
-				printf("DOWN pressed\n");
-			}
-
-			if (keys[SDLK_a]){
-				printf("LEFT pressed.\n");
-			}
-			else if (keys[SDLK_d]){
-				printf("RIGHT pressed\n");
-			}
-			*/
 		}
 	}
 }
@@ -103,7 +67,13 @@ void updateJoypadState(struct gameboy * gameboy, Uint8 * keys)
 	for (int i = 0; i < NO_OF_BUTTONS; i++){
 		struct buttonMap currentButton = buttons[i];
 		printf("%d ", gameboy->joypad.state[i]);
+		gameboy->joypad.previousState[currentButton.button] = gameboy->joypad.state[currentButton.button];
 		gameboy->joypad.state[currentButton.button] = keys[currentButton.sdlKey];
+
+		if (gameboy->joypad.state[currentButton.button] == 0 && gameboy->joypad.previousState[currentButton.button] == 1){
+			//fire interrupt
+			printf("interrupt\n");
+		}
 	}
 
 	printf("\n");
