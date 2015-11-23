@@ -1,6 +1,7 @@
 #include "../include/interrupt.h"
 #include "../include/gameboy.h"
 #include "../include/bitUtils.h"
+#include "../include/stack.h"
 #include <stdio.h>
 
 const uint8_t interruptRoutineAddresses[NO_OF_INTERRUPTS] = {
@@ -19,10 +20,10 @@ void requestInterrupt(struct gameboy * gameboy, enum interrupt interrupt)
 	//sets the corresponding bit in the Interrupt Request Register(0xFF0F)
 	//stored at gameboy->interrupts...
 
-	printf("Requesting interrupt %d\n", interrupt);
-	printf("%d\n", gameboy->interrupts.intRequest);
+	//printf("Requesting interrupt %d\n", interrupt);
+	//printf("%d\n", gameboy->interrupts.intRequest);
 	setBit(&gameboy->interrupts.intRequest, interrupt, true);
-	printf("%d\n", gameboy->interrupts.intRequest);
+	//printf("%d\n", gameboy->interrupts.intRequest);
 }
 
 void setInterruptMasterFlag(struct gameboy * gameboy, bool state)
@@ -54,6 +55,7 @@ static void doInterrupt(struct gameboy * gameboy, int i)
 {
 	gameboy->interrupts.masterEnable = false;
 	setBit(&gameboy->interrupts.intRequest, i, false); // reset bit
+	pushWordOntoStack(gameboy, gameboy->cpu.pc);
 	gameboy->cpu.pc = interruptRoutineAddresses[i]; 
 }
 

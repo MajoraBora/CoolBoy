@@ -7,5 +7,5 @@
 bool isBitSet(uint8_t data, uint8_t bit);
 void setBit(uint8_t * data, uint8_t bit, bool state);
 uint8_t getBit(int data, int position);
-
+void printBinFromDec(uint8_t dec);
 #endif

@@ -23,6 +23,15 @@ Joypad register is 8 bits
 	 
 */
 
+enum regBit {
+	RIGHT_OR_A,
+	LEFT_OR_B,
+	UP_OR_SELECT,
+	DOWN_OR_START,
+	DIRECTION_SELECT,
+	BUTTON_SELECT
+};
+
 enum button {
 	SELECT,
 	START,

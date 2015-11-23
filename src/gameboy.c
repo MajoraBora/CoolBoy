@@ -108,7 +108,7 @@ static void initialiseControls(struct gameboy * gameboy)
 {
 	gameboy->joypad.state = malloc(sizeof(int) * NO_OF_BUTTONS); //calloc with 1?
 	gameboy->joypad.previousState = malloc(sizeof(int) * NO_OF_BUTTONS); //calloc with 1?
-	//gameboy->joypad.reg = JOYPAD_REG_INIT; //00001111
+	gameboy->memory.mem[JOYPAD_REG] = JOYPAD_REG_INIT; //00001111
 	gameboy->joypad.buttonState = 0xFF; //all bits set to 1
 }
 
