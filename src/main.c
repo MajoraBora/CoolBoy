@@ -11,17 +11,18 @@
 #include "../include/extops.h"
 #include "../include/interrupt.h"
 #include "../include/joypad.h"
+#include "../include/display.h"
 
 int main(void)
 {
 	
 	struct gameboy * gameboy;
 	gameboy = createGameboy();
-	loadGame(gameboy, "../games/tetris.gb");
+	loadGame(gameboy, "../games/sml.gb");
+	startDisplay();
 
-	//startEmulationLoop(gameboy);
+	startEmulationLoop(gameboy);
 	
-	startKeyModule(gameboy);
 
 
 	return 0;

@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
 #include "../include/gameboy.h"
 #include "../include/registers.h"
 #include "../include/joypad.h"
@@ -30,13 +32,26 @@ void startEmulationLoop(struct gameboy * gameboy)
 {
 	//get instruction
 	//execute instruction
-
-	for (int i = 0; i >= 0; i++){
+	/*while(true){
 		executeNextOpcode(gameboy);
 		serviceInterrupts(gameboy);
-		
+		//sleep(1);
+	}*/
+
+	SDL_Event event;
+	Uint8 * keys = NULL;
+	bool quit = false;
+
+	while(!quit){
+		doJoypad(gameboy, &event, &keys, &quit);
+		executeNextOpcode(gameboy);
+		serviceInterrupts(gameboy);
+		updateGraphics(gameboy);
+		sleep(1);
 	}
-	//increment things
+
+	SDL_Quit();
+
 }
 
 void reset(struct gameboy * gameboy)
@@ -67,6 +82,8 @@ static void initialiseMemory(struct gameboy * gameboy)
 	printf("Resetting memory... ");
 	memset(gameboy->memory.mem, 0, sizeof(gameboy->memory.mem));
 	memset(gameboy->cartridge.memory, 0, sizeof(gameboy->cartridge.memory));
+	
+	gameboy->interrupts.masterEnable = true;
 
 	gameboy->memory.mem[0xFF05] = 0x0; //TIMA
 	gameboy->memory.mem[0xFF06] = 0x0;

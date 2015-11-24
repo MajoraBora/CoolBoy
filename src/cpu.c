@@ -567,9 +567,9 @@ void executeNextOpcode(struct gameboy * gameboy)
 {
 	//need to put game into main memory, sort out memory banks etc
 	uint8_t opcode = readByte(gameboy, gameboy->cpu.pc);
-	++gameboy->cpu.pc;
 	const struct instruction instruction = instructions[opcode];
 	printf("pc: %x, opcode: %s\n", gameboy->cpu.pc, instruction.instruction);
+	++gameboy->cpu.pc;
 
 	switch(instruction.operandLength){
 		case 0:

@@ -47,8 +47,9 @@ struct colour palette[4] = {
 
 struct colour frameBuffer[X * Y];
 
-void updateGraphics(struct gameboy * gameboy, int cycles)
+void updateGraphics(struct gameboy * gameboy)
 {
+	int cycles = gameboy->cpu.cycles;
 	uint8_t previousMode = getCurrentMode(gameboy);
 	setLCDStatus(gameboy);
 	requestAnyNewModeInterrupts(gameboy, previousMode);

@@ -182,6 +182,6 @@ If they are the same values, then an interrupt is requested
 */
 void setLCDStatus(struct gameboy * gameboy);
 bool isLCDEnabled(struct gameboy * gameboy);
-void updateGraphics(struct gameboy * gameboy, int cycles);
+void updateGraphics(struct gameboy * gameboy);
 void drawScanline(struct gameboy * gameboy);
 #endif

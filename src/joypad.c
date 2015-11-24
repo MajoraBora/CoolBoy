@@ -40,24 +40,28 @@ void handleKeys(SDL_Event * event, int * quit)
 	}
 }
 
+void doJoypad(struct gameboy * gameboy, SDL_Event * event, Uint8 ** keys, bool * quit)
+{
+	while(SDL_PollEvent(event)){
+        	*keys = SDL_GetKeyState(NULL);
+        	if ((*keys)[SDLK_ESCAPE]){
+			*quit = true;
+			break;
+		}
+
+		if (event->type == SDL_KEYUP || event->type == SDL_KEYDOWN){
+			updateJoypadState(gameboy, *keys);
+		}
+
+	}
+
+}
+
 void startKeyModule(struct gameboy * gameboy)
 {
 	SDL_Event event;
-	int quit = 0;
 	Uint8 * keys = NULL;
-
-	if (SDL_Init(SDL_INIT_VIDEO) < 0){
-		printf("error.\n");
-		exit(-1);
-	}
-
-	if (!SDL_SetVideoMode(255, 255, 0, 0)){
-		printf("error.\n");
-		SDL_Quit();
-		exit(-1);
-	}
-
-	SDL_EnableUNICODE(1);
+	bool quit = false;
 
 	while(!quit){
 		while(SDL_PollEvent(&event)){

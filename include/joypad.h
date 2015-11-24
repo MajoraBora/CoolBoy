@@ -86,6 +86,7 @@ Called when SDL key event is received
 Send this event to the joypad, which will figure out if it is a valid key
 if valid, set correct bits, request any interrupts
 */
+void doJoypad(struct gameboy * gameboy, SDL_Event * event, Uint8 ** keys, bool * quit);
 void keyPressed(struct gameboy * gameboy, SDL_Event * event);
 void handleKeys(SDL_Event * event, int * quit);
 void startKeyModule();

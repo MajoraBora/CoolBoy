@@ -180,6 +180,7 @@ uint8_t readByte(struct gameboy * gameboy, uint16_t address)
 		//look at data in memory address JOYPAD_REG (0xFF00)
 		//see if the game is interested in directional or standard buttons
 		//set joypad state as necessary
+		return gameboy->memory.mem[address]; // try this
 	}
 
 	return gameboy->memory.mem[address];
