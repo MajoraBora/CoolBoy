@@ -20,7 +20,7 @@ struct buttonMap buttons[NO_OF_BUTTONS] = {
 
 //use to map individual buttons to correct bit in reg
 static uint8_t sharedButtonBitValues[NO_OF_BUTTONS] = {
-	2, 3, 1, 0, 0, 1, 3, 2
+	UP_OR_SELECT, DOWN_OR_START, LEFT_OR_B, RIGHT_OR_A, RIGHT_OR_A, LEFT_OR_B, DOWN_OR_START, UP_OR_SELECT
 }; //dirty
 
 static enum regBit getCorrectSelectBit(enum button buttonIndex);
@@ -109,25 +109,15 @@ static void doInterruptIfAllowed(struct gameboy * gameboy, enum button buttonInd
 	uint8_t reg = gameboy->memory.mem[0xFF00];
 	
 	//!isBitSet because a 0 means it is selected
-	if (isDirectionalButton(buttonIndex)){
-		if (!isBitSet(reg, DIRECTION_SELECT)){
-			//printf("Directional interrupt\n");
-			setBit(&reg, sharedButtonBitValues[buttonIndex], false);
-			writeByte(gameboy, JOYPAD_REG, reg);
-			requestInterrupt(gameboy, joypad);
-		}
+
+	uint8_t regBit = sharedButtonBitValues[buttonIndex];
+	enum regBit selectBit = getCorrectSelectBit(buttonIndex);
+	if (!isBitSet(reg, selectBit)){
+		setBit(&reg, regBit, false);
+		writeByte(gameboy, JOYPAD_REG, reg);
+		requestInterrupt(gameboy, joypad);
 	}
-	else if (isStandardButton(buttonIndex)){
-		if (!isBitSet(reg, BUTTON_SELECT)){
-			setBit(&reg, sharedButtonBitValues[buttonIndex], false);
-			writeByte(gameboy, JOYPAD_REG, reg);
-			requestInterrupt(gameboy, joypad);
-			printf("Standard button interrupt\n");
-		}
-	}
-	else {
-		fprintf(stderr, "Error regarding Joypad interrupts.\n");
-	}
+
 	printf("joypad reg: ");
 	printBinFromDec(reg);
 }
@@ -162,8 +152,12 @@ static enum regBit getCorrectSelectBit(enum button buttonIndex)
 	if (isDirectionalButton(buttonIndex)){
 		return DIRECTION_SELECT;
 	}
-	else {
+	else if (isStandardButton(buttonIndex)){
 		return BUTTON_SELECT;
+	}
+	else {
+		fprintf(stderr, "Error reading from joypad register\n");
+		exit(-1); //do proper error code sometime
 	}
 }
 
