@@ -29,6 +29,8 @@ void requestInterrupt(struct gameboy * gameboy, enum interrupt interrupt)
 void setInterruptMasterFlag(struct gameboy * gameboy, bool state)
 {
 	gameboy->interrupts.masterEnable = state;
+	char * debug = state ? "enabling " : "disabling ";
+	printf("%s master interrupt\n", debug);
 }
 
 void serviceInterrupts(struct gameboy * gameboy)
