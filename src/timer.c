@@ -32,11 +32,11 @@ int getTimerFrequency(struct gameboy * gameboy)
 	return frequencies[lowerTwoBits];
 }
 
-void updateTimers(struct gameboy * gameboy, int cycles)
+void updateTimers(struct gameboy * gameboy)
 {
 	//for every (clockspeed/frequency) clock cycles, the timer should increment
 	//itself once
-
+	int cycles = gameboy->cpu.cycles;
 	handleDividerRegister(gameboy, cycles);
 
 	if (isTimerEnabled(gameboy)){

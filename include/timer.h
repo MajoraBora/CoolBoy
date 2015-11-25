@@ -30,6 +30,6 @@ struct timers {
 void initialiseTimerCounter(struct gameboy * gameboy);
 bool isTimerEnabled(struct gameboy * gameboy);
 int getTimerFrequency(struct gameboy * gameboy);
-void updateTimers(struct gameboy * gameboy, int cycles);
+void updateTimers(struct gameboy * gameboy);
 
 #endif

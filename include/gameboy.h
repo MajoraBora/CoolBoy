@@ -23,6 +23,7 @@ struct gameboy {
 
 struct gameboy * createGameboy();
 void startEmulationLoop(struct gameboy * gameboy);
+void update(struct gameboy * gameboy);
 void reset(struct gameboy * gameboy);
 void destroyGameboy(struct gameboy * gameboy);
 

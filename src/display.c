@@ -1,4 +1,5 @@
 #include "../include/display.h"
+#include "../include/gameboy.h"
 
 void startDisplay()
 {
@@ -14,6 +15,11 @@ void startDisplay()
         }
 
         SDL_EnableUNICODE(1);
+
+}
+
+void renderGraphics(struct gameboy * gameboy)
+{
 
 }
 

@@ -6,6 +6,7 @@
 #include "../include/gameboy.h"
 #include "../include/registers.h"
 #include "../include/joypad.h"
+#include "../include/display.h"
 
 static void initialiseCPU(struct gameboy * gameboy);
 static void initialiseMemory(struct gameboy * gameboy);
@@ -44,14 +45,29 @@ void startEmulationLoop(struct gameboy * gameboy)
 
 	while(!quit){
 		doJoypad(gameboy, &event, &keys, &quit);
-		executeNextOpcode(gameboy);
-		serviceInterrupts(gameboy);
-		updateGraphics(gameboy);
-		sleep(1);
+		update(gameboy); //call this 60 times a second
 	}
 
 	SDL_Quit();
 
+}
+
+void update(struct gameboy * gameboy)
+{
+	int cycles = 0;
+	while (cycles <= CYCLES_PER_FRAME){
+		executeNextOpcode(gameboy);
+		updateTimers(gameboy);
+		updateGraphics(gameboy);
+		serviceInterrupts(gameboy);
+		sleep(1);
+		cycles += gameboy->cpu.cycles;
+		printf("%d\n", cycles);
+	}
+
+	renderGraphics(gameboy);
+	gameboy->cpu.cycles = 0;
+	printf("update done\n");
 }
 
 void reset(struct gameboy * gameboy)

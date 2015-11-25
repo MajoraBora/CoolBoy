@@ -32,6 +32,8 @@ Represent 1 byte as an unsigned char
 
 //4194304Hz
 #define CLOCKSPEED 4194304
+#define FPS 60
+#define CYCLES_PER_FRAME (CLOCKSPEED / FPS)
 
 #define NO_OF_INSTRUCTIONS 256
 
