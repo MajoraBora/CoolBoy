@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <time.h>
 #include "../include/gameboy.h"
 #include "../include/registers.h"
 #include "../include/joypad.h"
@@ -54,20 +55,27 @@ void startEmulationLoop(struct gameboy * gameboy)
 
 void update(struct gameboy * gameboy)
 {
+	static int frame;
 	int cycles = 0;
+	clock_t start = clock();
 	while (cycles <= CYCLES_PER_FRAME){
 		executeNextOpcode(gameboy);
 		updateTimers(gameboy);
 		updateGraphics(gameboy);
 		serviceInterrupts(gameboy);
-		sleep(1);
-		cycles += gameboy->cpu.cycles;
-		printf("%d\n", cycles);
+		cycles = gameboy->cpu.cycles;
+		//printf("%d\n", cycles);
 	}
-
 	renderGraphics(gameboy);
-	gameboy->cpu.cycles = 0;
-	printf("update done\n");
+	float elapsedSecs = (float)(clock() - start)/CLOCKS_PER_SEC;
+	float remainingFrameTime = (1/(float)FPS) - elapsedSecs;
+	const struct timespec req = {0, remainingFrameTime * 1000000000L};
+	nanosleep(&req, NULL);
+	gameboy->cpu.cycles -= CYCLES_PER_FRAME;
+	++frame;
+	if (frame % 60 == 0){
+		printf("frame %d\n", frame);
+	}
 }
 
 void reset(struct gameboy * gameboy)
