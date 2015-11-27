@@ -74,7 +74,7 @@ void update(struct gameboy * gameboy)
 	gameboy->cpu.cycles -= CYCLES_PER_FRAME;
 	++frame;
 	if (frame % 60 == 0){
-		printf("frame %d\n", frame);
+		printf("frame %d, %f\n", frame, (remainingFrameTime + elapsedSecs));
 	}
 }
 
