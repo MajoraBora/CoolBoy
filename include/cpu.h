@@ -101,6 +101,7 @@ struct cpu {
 	uint16_t sp;
 	uint16_t pc;
 	int cycles;
+	struct instruction previousInstruction;
 
 };
 

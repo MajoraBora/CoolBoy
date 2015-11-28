@@ -1,8 +1,10 @@
 #include "../include/lcd.h"
+#include "../include/display.h"
 #include "../include/bitUtils.h"
 #include "../include/gameboy.h"
 #include "../include/memory.h"
 #include <stdio.h>
+#include <unistd.h>
 
 static void doScanline(struct gameboy * gameboy);
 static void handleCurrentScanline(struct gameboy * gameboy);
@@ -37,19 +39,51 @@ const void (*scanModeFuncs[4]) = {
 	handleTransferToLCDDriver
 };
 
+struct colour white = {255, 255, 255};
+struct colour lightGrey = {0xCC, 0xCC, 0xCC};
+struct colour darkGrey = {0x77, 0x77, 0x77};
+struct colour black = {0, 0, 0};
+
 //move this
 struct colour palette[4] = {
-	{255, 255, 255}, //white
-	{0xCC, 0xCC, 0xCC}, //light grey
-	{0x77, 0x77, 0x77}, //dark grey
-	{0, 0, 0} //black
+	{255, 255, 255}, 
+	{0xCC, 0xCC, 0xCC}, 
+	{0x77, 0x77, 0x77}, 
+	{0, 0, 0}
 };
 
 struct colour frameBuffer[X * Y];
 
+static void bufferPixel(struct gameboy * gameboy, int row, int col, struct colour colour)
+{
+	gameboy->screen.frameBuffer[X * row + col] = colour;
+}
+
+void updateGraphicsTest(struct gameboy * gameboy)
+{
+	//fill a frame buffer with some simple pixel data and see if it draws correctly
+	static int count;
+	bufferPixel(gameboy, 5, 10, lightGrey);
+	bufferPixel(gameboy, 50, 10, black);
+	//printf("status before: ");
+	//printBinFromDec(gameboy->screen.status);
+	setLCDStatus(gameboy);
+	if (isLCDEnabled(gameboy)){
+		gameboy->screen.scanlineCounter += gameboy->cpu.previousInstruction.cycles;
+	}
+	//printf("status after: ");
+	//printBinFromDec(gameboy->screen.status);
+	++count;
+	printf("%d\n", gameboy->screen.scanlineCounter);
+	if (count > 2){
+		//exit(-1);
+	}
+	
+}
+
 void updateGraphics(struct gameboy * gameboy)
 {
-	int cycles = gameboy->cpu.cycles;
+	int cycles = gameboy->cpu.previousInstruction.cycles;
 	uint8_t previousMode = getCurrentMode(gameboy);
 	setLCDStatus(gameboy);
 	requestAnyNewModeInterrupts(gameboy, previousMode);
@@ -129,19 +163,25 @@ void setLCDStatus(struct gameboy * gameboy)
 	//when the lcd mode is disabled, the status mode must be set to 1
 	if (!isLCDEnabled(gameboy)){
 		//starting a new scan line sets the lcd status to 2
+		//printf("LCD isn't enabled - starting new scanline\n");
 		startNewScanline(gameboy);
 	}
 	else {
+	//	printf("LCD is enabled\n");
 		if (isInVBlankBounds(gameboy)){
+			//printf("Handle vblank\n");
 			handleVBlank(gameboy);
 		}
 		else if (isInSpriteAttributeBounds(gameboy)){
+			//printf("Handle OAM\n");
 			handleSpriteSearch(gameboy);
 		}
 		else if (isInDriverTransferBounds(gameboy)){
+			//printf("handle transfer\n");
 			handleTransferToLCDDriver(gameboy);
 		}
 		else {
+			//printf("handle hblank\n");
 			handleHBlank(gameboy);
 		}
 		
@@ -276,7 +316,7 @@ static void renderTiles(struct gameboy * gameboy)
 		//now we have the colour ID, get the actual colour from 0xFF47
 		struct colour colour = getColour(gameboy, colourNum, 0xFF47);
 
-		frameBuffer[(pixel * X) + gameboy->screen.currentScanline] = colour;
+		gameboy->screen.frameBuffer[(pixel * Y) + gameboy->screen.currentScanline] = colour;
 	}
 	
 }
@@ -362,8 +402,9 @@ static void renderSprites(struct gameboy * gameboy)
 				xPix += 7;
 				int pixel = xPos + xPix;
 				
-				int pixelOffset = (scanline * X) + pixel; 
-				frameBuffer[pixelOffset] = colour;
+				int pixelOffset = (scanline * Y) + pixel; 
+
+				gameboy->screen.frameBuffer[pixelOffset] = colour;
 			}
 		}
 	}
@@ -385,7 +426,8 @@ static void startNewScanline(struct gameboy * gameboy)
 	//if LCD is disabled, set mode to 1
 	gameboy->screen.scanlineCounter = 0;
 	gameboy->screen.currentScanline = 0;
-	gameboy->screen.status &= 252; //whats going on?
+	//gameboy->screen.status &= 252; //whats going on?
+	setBit(&gameboy->screen.control, lcdEnable, true);
 	setBit(&gameboy->screen.status, hBlank, true);
 }
 

@@ -115,6 +115,11 @@ Every 2 bits in a palette represent a colour
 #define REGION_ONE_BG_MEMORY 0x9800
 
 struct gameboy;
+struct colour {
+	uint8_t red;
+	uint8_t green;
+	uint8_t blue;
+};
 
 struct screen {
 	uint8_t control;
@@ -127,6 +132,7 @@ struct screen {
 	uint8_t windowXPos;
 	uint8_t windowYPos;
 	bool currentLCDInterruptEnabled;
+	struct colour frameBuffer[X * Y];
 };
 
 enum controlBit {
@@ -147,11 +153,6 @@ enum statusBitMode {
 	oamVramRead
 };
 
-struct colour {
-	uint8_t red;
-	uint8_t green;
-	uint8_t blue;
-};
 
 /*
 The memory address at 0xFF41 holds the current status of the LCD. The LCD goes through
@@ -183,5 +184,6 @@ If they are the same values, then an interrupt is requested
 void setLCDStatus(struct gameboy * gameboy);
 bool isLCDEnabled(struct gameboy * gameboy);
 void updateGraphics(struct gameboy * gameboy);
+void updateGraphicsTest(struct gameboy * gameboy);
 void drawScanline(struct gameboy * gameboy);
 #endif

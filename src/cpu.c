@@ -597,6 +597,8 @@ void executeNextOpcode(struct gameboy * gameboy)
 		}
 	}
 
+	gameboy->cpu.previousInstruction = instruction;
+
 	if (opcode != 0xCB){
 		//if opcode wasn't extended, add cycles
 		gameboy->cpu.cycles += instruction.cycles;

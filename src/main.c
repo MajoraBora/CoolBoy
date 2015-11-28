@@ -18,7 +18,7 @@ int main(void)
 	
 	struct gameboy * gameboy;
 	gameboy = createGameboy();
-	loadGame(gameboy, "../games/sml.gb");
+	loadGame(gameboy, "../games/tetris.gb");
 	startDisplay();
 
 	startEmulationLoop(gameboy);

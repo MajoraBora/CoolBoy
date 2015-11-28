@@ -8,6 +8,7 @@
 #include "../include/registers.h"
 #include "../include/joypad.h"
 #include "../include/display.h"
+#include "../include/bitUtils.h"
 
 static void initialiseCPU(struct gameboy * gameboy);
 static void initialiseMemory(struct gameboy * gameboy);
@@ -61,7 +62,8 @@ void update(struct gameboy * gameboy)
 	while (cycles <= CYCLES_PER_FRAME){
 		executeNextOpcode(gameboy);
 		updateTimers(gameboy);
-		updateGraphics(gameboy);
+		//updateGraphics(gameboy);
+		updateGraphicsTest(gameboy);
 		serviceInterrupts(gameboy);
 		cycles = gameboy->cpu.cycles;
 		//printf("%d\n", cycles);
@@ -75,6 +77,7 @@ void update(struct gameboy * gameboy)
 	++frame;
 	if (frame % 60 == 0){
 		printf("frame %d, %f\n", frame, (remainingFrameTime + elapsedSecs));
+		printf("elapsed secs: %f\n", elapsedSecs);
 	}
 }
 
@@ -108,6 +111,8 @@ static void initialiseMemory(struct gameboy * gameboy)
 	memset(gameboy->cartridge.memory, 0, sizeof(gameboy->cartridge.memory));
 	
 	gameboy->interrupts.masterEnable = true;
+	setBit(&gameboy->screen.control, bgDisplayEnable, true);
+	setBit(&gameboy->screen.control, spriteEnable, true);
 
 	gameboy->memory.mem[0xFF05] = 0x0; //TIMA
 	gameboy->memory.mem[0xFF06] = 0x0;
