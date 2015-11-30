@@ -42,7 +42,7 @@ void serviceInterrupts(struct gameboy * gameboy)
 	if (gameboy->interrupts.masterEnable){
 		uint8_t enabledRequests = gameboy->interrupts.intRequest & gameboy->interrupts.intEnable;
 		//If the bit is set, do the interrupt
-		for (int i = vblank; i <= joypad; i++){
+		for (int i = int_vblank; i <= joypad; i++){
 			//printf("%d: %d\n", i, enabledRequests);
 			if (isBitSet(enabledRequests, i)){
 				//interruptFunctions[i]; //execute correct function

@@ -63,20 +63,31 @@ void updateGraphicsTest(struct gameboy * gameboy)
 {
 	//fill a frame buffer with some simple pixel data and see if it draws correctly
 	static int count;
-	bufferPixel(gameboy, 5, 10, lightGrey);
-	bufferPixel(gameboy, 50, 10, black);
-	//printf("status before: ");
-	//printBinFromDec(gameboy->screen.status);
 	setLCDStatus(gameboy);
 	if (isLCDEnabled(gameboy)){
 		gameboy->screen.scanlineCounter += gameboy->cpu.previousInstruction.cycles;
 	}
-	//printf("status after: ");
-	//printBinFromDec(gameboy->screen.status);
-	++count;
-	printf("%d\n", gameboy->screen.scanlineCounter);
-	if (count > 2){
-		//exit(-1);
+	else {
+		return;
+	}
+	
+	if (gameboy->screen.scanlineCounter >= SCANLINE_CYCLE_TIME){
+		gameboy->screen.currentScanline++;
+		gameboy->screen.scanlineCounter = 0;
+		if (gameboy->screen.currentScanline == Y){
+			requestInterrupt(gameboy, int_vblank);
+			printf("start vblank\n");
+		}
+		else if (gameboy->screen.currentScanline > (Y + NO_OF_INVISIBLE_SCANLINES)){
+			gameboy->screen.currentScanline = 0;
+			printf("resetting scanline\n");
+		}
+		else if (gameboy->screen.currentScanline < Y){
+			printf("drawing scanline %d\n", gameboy->screen.currentScanline);
+		}
+		else {
+			printf("In vblank\n");
+		}
 	}
 	
 }
@@ -135,7 +146,7 @@ static void handleCurrentScanline(struct gameboy * gameboy)
 {
 	uint8_t currentScanline = gameboy->screen.currentScanline;
 	if (currentScanline == Y){
-		requestInterrupt(gameboy, vblank);
+		requestInterrupt(gameboy, int_vblank);
 	}
 	else if (currentScanline > (Y + NO_OF_INVISIBLE_SCANLINES)){
 		gameboy->screen.currentScanline = 0; //reset
@@ -186,6 +197,7 @@ void setLCDStatus(struct gameboy * gameboy)
 		}
 		
 	}
+
 }
 
 void drawScanline(struct gameboy * gameboy)

@@ -47,6 +47,11 @@ void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data)
 	else if (address == DMA_ADDRESS){
 		doDMATransfer(gameboy, data);
 	}
+	else if (address == CURRENT_SCANLINE){
+		printf("resetting scanline\n");
+		exit(-1);
+		gameboy->screen.currentScanline = 0;
+	}
 	else {
 		gameboy->memory.mem[address] = data;
 	}
@@ -173,8 +178,8 @@ uint8_t readByte(struct gameboy * gameboy, uint16_t address)
 		return gameboy->cartridge.ramBanks[(address - RAM_BANK_START) + (gameboy->cartridge.currentRAMBank * RAM_BANK_SIZE)];
 	}
 	else if (address == CURRENT_SCANLINE){
-		//any reads from currentscanline reset it
-		gameboy->screen.currentScanline = 0;
+		printf("Reading scanline\n");
+		return gameboy->screen.currentScanline;
 	}
 	else if (address == JOYPAD_REG){
 		//look at data in memory address JOYPAD_REG (0xFF00)

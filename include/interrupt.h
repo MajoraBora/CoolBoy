@@ -13,7 +13,7 @@ struct gameboy;
 
 //corresponds to interrupt bits in flag registers
 enum interrupt {
-	vblank,
+	int_vblank, //change the rest when needed
 	lcdStat,
 	timer,
 	serial,
