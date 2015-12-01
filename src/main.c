@@ -22,8 +22,6 @@ int main(void)
 	startDisplay();
 
 	startEmulationLoop(gameboy);
-	
-
 
 	return 0;
 

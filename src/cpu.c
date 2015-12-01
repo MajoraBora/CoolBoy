@@ -612,6 +612,7 @@ void executeNextOpcode(struct gameboy * gameboy)
 
 void nop(struct gameboy * gameboy)
 {
+	
 }
 
 void ld_bc_nn(struct gameboy * gameboy, uint16_t nn)
@@ -2071,6 +2072,11 @@ void cp_n(struct gameboy * gameboy, uint8_t n)
 
 void rst_38(struct gameboy * gameboy)
 {
+	static int count;
+	count++;
+	if (count > 10){
+		exit(-1);
+	}
 	pushWordOntoStack(gameboy, gameboy->cpu.pc);
 	gameboy->cpu.pc = 0x38;
 }

@@ -47,10 +47,16 @@ void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data)
 	else if (address == DMA_ADDRESS){
 		doDMATransfer(gameboy, data);
 	}
+	else if (address == CONTROL_REG){
+		gameboy->screen.control = data;
+	}
 	else if (address == CURRENT_SCANLINE){
 		printf("resetting scanline\n");
 		exit(-1);
 		gameboy->screen.currentScanline = 0;
+	}
+	else if (address == STATUS_REG){
+		gameboy->screen.status = data;
 	}
 	else {
 		gameboy->memory.mem[address] = data;
@@ -186,6 +192,12 @@ uint8_t readByte(struct gameboy * gameboy, uint16_t address)
 		//see if the game is interested in directional or standard buttons
 		//set joypad state as necessary
 		return gameboy->memory.mem[address]; // try this
+	}
+	else if (address == CONTROL_REG){
+		return gameboy->screen.control;
+	}
+	else if (address == STATUS_REG){
+		return gameboy->screen.status;
 	}
 
 	return gameboy->memory.mem[address];

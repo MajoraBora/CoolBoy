@@ -62,8 +62,9 @@ static void bufferPixel(struct gameboy * gameboy, int row, int col, struct colou
 void updateGraphicsTest(struct gameboy * gameboy)
 {
 	//fill a frame buffer with some simple pixel data and see if it draws correctly
-	static int count;
 	setLCDStatus(gameboy);
+	uint8_t previousMode = getCurrentMode(gameboy);
+	requestAnyNewModeInterrupts(gameboy, previousMode);
 	if (isLCDEnabled(gameboy)){
 		gameboy->screen.scanlineCounter += gameboy->cpu.previousInstruction.cycles;
 	}
@@ -84,6 +85,7 @@ void updateGraphicsTest(struct gameboy * gameboy)
 		}
 		else if (gameboy->screen.currentScanline < Y){
 			printf("drawing scanline %d\n", gameboy->screen.currentScanline);
+			drawScanline(gameboy);
 		}
 		else {
 			printf("In vblank\n");
@@ -128,7 +130,6 @@ static void doCoincidenceFlag(struct gameboy * gameboy)
 	else {
 		setBit(&gameboy->screen.status, COINCIDENCE_BIT, false);
 	}
-
 			
 }
 

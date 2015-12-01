@@ -33,14 +33,6 @@ struct gameboy * createGameboy()
 
 void startEmulationLoop(struct gameboy * gameboy)
 {
-	//get instruction
-	//execute instruction
-	/*while(true){
-		executeNextOpcode(gameboy);
-		serviceInterrupts(gameboy);
-		//sleep(1);
-	}*/
-
 	SDL_Event event;
 	Uint8 * keys = NULL;
 	bool quit = false;
