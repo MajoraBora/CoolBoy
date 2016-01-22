@@ -2,6 +2,7 @@
 #include "../include/gameboy.h"
 #include "../include/dma.h"
 #include "../include/joypad.h"
+#include "../include/debug.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -29,7 +30,12 @@ void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data)
 		gameboy->memory.mem[address + ECHO_OFFSET] = data;
 	}
 	else if ((address >= RESTRICTED_START) && (address < RESTRICTED_END)){
-		fprintf(stderr, "WriteMemory: address %x is within restricted memory %x - %x\n", address, RESTRICTED_START, RESTRICTED_END);
+		printf("sp: %x\n", gameboy->cpu.sp);
+		printf("WriteMemory: address %x is within restricted memory %x - %x\n", address, RESTRICTED_START, RESTRICTED_END);
+	//	fprintf(stderr, "WriteMemory: address %x is within restricted memory %x - %x\n", address, RESTRICTED_START, RESTRICTED_END);
+		printDebugTrace(gameboy);
+		
+		exit(-1);
 	}
 	else if (address == TMC){
 		//the game is trying to change the timer controller
@@ -52,7 +58,6 @@ void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data)
 	}
 	else if (address == CURRENT_SCANLINE){
 		printf("resetting scanline\n");
-		exit(-1);
 		gameboy->screen.currentScanline = 0;
 	}
 	else if (address == STATUS_REG){
@@ -184,7 +189,7 @@ uint8_t readByte(struct gameboy * gameboy, uint16_t address)
 		return gameboy->cartridge.ramBanks[(address - RAM_BANK_START) + (gameboy->cartridge.currentRAMBank * RAM_BANK_SIZE)];
 	}
 	else if (address == CURRENT_SCANLINE){
-		printf("Reading scanline\n");
+		//printf("Reading scanline\n");
 		return gameboy->screen.currentScanline;
 	}
 	else if (address == JOYPAD_REG){

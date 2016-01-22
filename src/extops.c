@@ -500,7 +500,7 @@ void executeExtendedOpcode(struct gameboy * gameboy, uint8_t opcode)
 
 	gameboy->cpu.cycles += cycles;
 
-	printf("extended op: %s\n", instruction.instruction);
+//	printf("extended op: %s\n", instruction.instruction);
 }
 
 void cb_rlc_b(struct gameboy * gameboy)

@@ -84,7 +84,7 @@ void updateGraphicsTest(struct gameboy * gameboy)
 			printf("resetting scanline\n");
 		}
 		else if (gameboy->screen.currentScanline < Y){
-			printf("drawing scanline %d\n", gameboy->screen.currentScanline);
+//			printf("drawing scanline %d\n", gameboy->screen.currentScanline);
 			drawScanline(gameboy);
 		}
 		else {

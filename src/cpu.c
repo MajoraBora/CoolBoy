@@ -568,7 +568,7 @@ void executeNextOpcode(struct gameboy * gameboy)
 	//need to put game into main memory, sort out memory banks etc
 	uint8_t opcode = readByte(gameboy, gameboy->cpu.pc);
 	const struct instruction instruction = instructions[opcode];
-	printf("pc: %x, opcode: %s ", gameboy->cpu.pc, instruction.instruction);
+	//printf("pc: %x, opcode: %s ", gameboy->cpu.pc, instruction.instruction);
 	++gameboy->cpu.pc;
 
 	switch(instruction.operandLength){
@@ -583,7 +583,7 @@ void executeNextOpcode(struct gameboy * gameboy)
 			//1 operand, get byte
 			uint8_t byte = readByte(gameboy, gameboy->cpu.pc);
 			++gameboy->cpu.pc;
-			printf("arg: %x", byte);
+//			printf("arg: %x", byte);
 			((void(*)(struct gameboy *, uint8_t))instruction.function)(gameboy, byte);
 			break;
 		}
@@ -591,7 +591,7 @@ void executeNextOpcode(struct gameboy * gameboy)
 		{
 			uint16_t word = readWord(gameboy, gameboy->cpu.pc);
 			gameboy->cpu.pc += 2;
-			printf("arg: %x", word);
+//			printf("arg: %x", word);
 			((void(*)(struct gameboy *, uint16_t))instruction.function)(gameboy, word);
 			break;
 		}
@@ -604,7 +604,7 @@ void executeNextOpcode(struct gameboy * gameboy)
 		gameboy->cpu.cycles += instruction.cycles;
 	}
 
-	printf("\n");
+	//printf("\n");
 	//extended opcode have their own cycle counts, which is sorted inside the 
 	//extops module
 	//printf("%d\n", gameboy->cpu.cycles);
@@ -958,6 +958,7 @@ void ld_sp_nn(struct gameboy * gameboy, uint16_t nn)
 void ldd_hlp_a(struct gameboy * gameboy)
 {
 	//load a into memory address at HL, decrement HL
+	//printf("A: %x, HL: %x\n", gameboy->cpu.a, gameboy->cpu.hl);
 	writeByte(gameboy, gameboy->cpu.hl, gameboy->cpu.a);
 	--gameboy->cpu.hl;
 	
@@ -2075,7 +2076,6 @@ void rst_38(struct gameboy * gameboy)
 	static int count;
 	count++;
 	if (count > 10){
-		exit(-1);
 	}
 	pushWordOntoStack(gameboy, gameboy->cpu.pc);
 	gameboy->cpu.pc = 0x38;

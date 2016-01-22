@@ -54,7 +54,6 @@ void update(struct gameboy * gameboy)
 	while (cycles <= CYCLES_PER_FRAME){
 		executeNextOpcode(gameboy);
 		updateTimers(gameboy);
-		//updateGraphics(gameboy);
 		updateGraphicsTest(gameboy);
 		serviceInterrupts(gameboy);
 		cycles = gameboy->cpu.cycles;
