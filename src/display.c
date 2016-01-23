@@ -18,6 +18,7 @@ static void initialiseSDL()
 
 static void initialiseOpenGL()
 {
+	
 	glViewport(0, 0, DISPLAY_X, DISPLAY_Y);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -31,6 +32,7 @@ static void initialiseOpenGL()
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DITHER);
 	glDisable(GL_BLEND);
+
 }
 
 void startDisplay()
@@ -45,7 +47,9 @@ void renderGraphics(struct gameboy * gameboy)
 	glLoadIdentity();
 	glRasterPos2i(-1, 1);
 	glPixelZoom(1, -1);
-	glDrawPixels(X, Y, GL_RGB, GL_UNSIGNED_BYTE, gameboy->screen.frameBuffer);
+	//glDrawPixels(X, Y, GL_RGB, GL_UNSIGNED_BYTE, gameboy->screen.frameBuffer);
+	//glDrawPixels(X, Y, GL_RGB, GL_UNSIGNED_BYTE, gameboy->screen.frameBuffer3D);
+	glDrawPixels(X, Y, GL_RGB, GL_UNSIGNED_BYTE, gameboy->screen.frameBufferNew);
 	SDL_GL_SwapBuffers();
 }
 

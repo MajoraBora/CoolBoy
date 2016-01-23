@@ -57,7 +57,7 @@ void update(struct gameboy * gameboy)
 		updateGraphicsTest(gameboy);
 		serviceInterrupts(gameboy);
 		cycles = gameboy->cpu.cycles;
-		//printf("%d\n", cycles);
+		
 	}
 	renderGraphics(gameboy);
 	float elapsedSecs = (float)(clock() - start)/CLOCKS_PER_SEC;
@@ -66,10 +66,12 @@ void update(struct gameboy * gameboy)
 	nanosleep(&req, NULL);
 	gameboy->cpu.cycles -= CYCLES_PER_FRAME;
 	++frame;
+	//printf("frame: %d\n", frame);
 	if (frame % 60 == 0){
 		printf("frame %d, %f\n", frame, (remainingFrameTime + elapsedSecs));
 		printf("elapsed secs: %f\n", elapsedSecs);
 	}
+	
 }
 
 void reset(struct gameboy * gameboy)
@@ -100,10 +102,11 @@ static void initialiseMemory(struct gameboy * gameboy)
 	printf("Resetting memory... ");
 	memset(gameboy->memory.mem, 0, sizeof(gameboy->memory.mem));
 	memset(gameboy->cartridge.memory, 0, sizeof(gameboy->cartridge.memory));
+	//memset(gameboy->screen.frameBuffer3D, 0, sizeof(gameboy->screen.frameBuffer3D));
 	
-	gameboy->interrupts.masterEnable = true;
-	setBit(&gameboy->screen.control, bgDisplayEnable, true);
-	setBit(&gameboy->screen.control, spriteEnable, true);
+	//gameboy->interrupts.masterEnable = true;
+	//setBit(&gameboy->screen.control, bgDisplayEnable, true);
+	//setBit(&gameboy->screen.control, spriteEnable, true);
 
 	gameboy->memory.mem[0xFF05] = 0x0; //TIMA
 	gameboy->memory.mem[0xFF06] = 0x0;

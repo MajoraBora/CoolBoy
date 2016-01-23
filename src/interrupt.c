@@ -51,6 +51,9 @@ void serviceInterrupts(struct gameboy * gameboy)
 			}
 		}
 	}
+	else {
+		//printf("Interrupts are disabled\n");
+	}
 }
 
 static void doInterrupt(struct gameboy * gameboy, int i)

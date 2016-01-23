@@ -121,6 +121,13 @@ struct colour {
 	uint8_t blue;
 };
 
+enum COLOUR {
+	WHITE,
+	LIGHT_GREY,
+	DARK_GREY,
+	BLACK
+};
+
 struct screen {
 	uint8_t control;
 	uint8_t status;
@@ -133,6 +140,8 @@ struct screen {
 	uint8_t windowYPos;
 	bool currentLCDInterruptEnabled;
 	struct colour frameBuffer[X * Y];
+	uint8_t frameBuffer3D[X][Y][3]; //3D array of RGB values
+	uint8_t frameBufferNew[X * Y * 3];
 };
 
 enum controlBit {

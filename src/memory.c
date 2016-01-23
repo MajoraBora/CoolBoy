@@ -30,12 +30,11 @@ void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data)
 		gameboy->memory.mem[address + ECHO_OFFSET] = data;
 	}
 	else if ((address >= RESTRICTED_START) && (address < RESTRICTED_END)){
-		printf("sp: %x\n", gameboy->cpu.sp);
-		printf("WriteMemory: address %x is within restricted memory %x - %x\n", address, RESTRICTED_START, RESTRICTED_END);
+		//printf("sp: %x\n", gameboy->cpu.sp);
+		//printf("WriteMemory: address %x is within restricted memory %x - %x\n", address, RESTRICTED_START, RESTRICTED_END);
 	//	fprintf(stderr, "WriteMemory: address %x is within restricted memory %x - %x\n", address, RESTRICTED_START, RESTRICTED_END);
-		printDebugTrace(gameboy);
+		//printDebugTrace(gameboy);
 		
-		exit(-1);
 	}
 	else if (address == TMC){
 		//the game is trying to change the timer controller
@@ -57,7 +56,7 @@ void writeByte(struct gameboy * gameboy, uint16_t address, uint8_t data)
 		gameboy->screen.control = data;
 	}
 	else if (address == CURRENT_SCANLINE){
-		printf("resetting scanline\n");
+		//printf("resetting scanline\n");
 		gameboy->screen.currentScanline = 0;
 	}
 	else if (address == STATUS_REG){

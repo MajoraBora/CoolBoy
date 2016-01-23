@@ -1995,7 +1995,7 @@ void ldh_a_n(struct gameboy * gameboy, uint8_t n)
 	//put memory address FF00 + n into A
 	uint8_t byte = readByte(gameboy, LDH_BASE + n);	
 	gameboy->cpu.a = byte;
-	printf("loading %d into a from %x\n", byte, (LDH_BASE + n));
+	//printf("loading %d into a from %x\n", byte, (LDH_BASE + n));
 	
 	
 }
