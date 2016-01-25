@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 const struct instruction instructions[NO_OF_INSTRUCTIONS] = {
 	// 0x00 - 0x0F
@@ -565,10 +566,12 @@ static void compareWithRegA(struct gameboy * gameboy, uint8_t value)
 
 void executeNextOpcode(struct gameboy * gameboy)
 {
-	//need to put game into main memory, sort out memory banks etc
+	static int count;
+	//neeld to put game into main memory, sort out memory banks etc
 	uint8_t opcode = readByte(gameboy, gameboy->cpu.pc);
+	//if (opcode == 0xFF) exit(-1);
 	const struct instruction instruction = instructions[opcode];
-	//printf("pc: %x, opcode: %s ", gameboy->cpu.pc, instruction.instruction);
+	//printf("opcode: %x, pc: %x, instruction: %s ", opcode, gameboy->cpu.pc, instruction.instruction);
 	++gameboy->cpu.pc;
 
 	switch(instruction.operandLength){
@@ -583,7 +586,7 @@ void executeNextOpcode(struct gameboy * gameboy)
 			//1 operand, get byte
 			uint8_t byte = readByte(gameboy, gameboy->cpu.pc);
 			++gameboy->cpu.pc;
-//			printf("arg: %x", byte);
+			printf("arg: %x", byte);
 			((void(*)(struct gameboy *, uint8_t))instruction.function)(gameboy, byte);
 			break;
 		}
@@ -591,7 +594,7 @@ void executeNextOpcode(struct gameboy * gameboy)
 		{
 			uint16_t word = readWord(gameboy, gameboy->cpu.pc);
 			gameboy->cpu.pc += 2;
-//			printf("arg: %x", word);
+			printf("arg: %x", word);
 			((void(*)(struct gameboy *, uint16_t))instruction.function)(gameboy, word);
 			break;
 		}
@@ -604,7 +607,15 @@ void executeNextOpcode(struct gameboy * gameboy)
 		gameboy->cpu.cycles += instruction.cycles;
 	}
 
-	//printf("\n");
+	count++;
+	if (count == 20){
+		//exit(-1);
+	}
+
+	//++gameboy->cpu.pc;
+
+	printf("\n");
+	//sleep(1);
 	//extended opcode have their own cycle counts, which is sorted inside the 
 	//extops module
 	//printf("%d\n", gameboy->cpu.cycles);
@@ -612,7 +623,6 @@ void executeNextOpcode(struct gameboy * gameboy)
 
 void nop(struct gameboy * gameboy)
 {
-	
 }
 
 void ld_bc_nn(struct gameboy * gameboy, uint16_t nn)
@@ -1032,6 +1042,7 @@ void dec_a(struct gameboy * gameboy)
 void ld_a_n(struct gameboy * gameboy, uint8_t n)
 {
 	gameboy->cpu.a = n;
+	printf("\nReg A: %x", gameboy->cpu.a);
 }
 
 void ccf(struct gameboy * gameboy)
@@ -1757,7 +1768,7 @@ void add_a_n(struct gameboy * gameboy, uint8_t n)
 
 void rst_0(struct gameboy * gameboy)
 {
-	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	pushWordOntoStack(gameboy, gameboy->cpu.pc + 1);
 	gameboy->cpu.pc = 0x0;
 }
 
@@ -1775,6 +1786,7 @@ void ret(struct gameboy * gameboy)
 	//pop two bytes from stack and set PC
 	uint16_t word = popWordFromStack(gameboy);
 	gameboy->cpu.pc = word;
+	printf("pc after ret = %x\n", gameboy->cpu.pc);
 }
 
 void jp_z_nn(struct gameboy * gameboy, uint16_t nn)
@@ -1811,7 +1823,7 @@ void adc_a_n(struct gameboy * gameboy, uint8_t n)
 
 void rst_8(struct gameboy * gameboy)
 {
-	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	pushWordOntoStack(gameboy, gameboy->cpu.pc + 1);
 	gameboy->cpu.pc = 0x08;
 
 }
@@ -1859,7 +1871,7 @@ void sub_a_n(struct gameboy * gameboy, uint8_t n)
 
 void rst_10(struct gameboy * gameboy)
 {
-	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	pushWordOntoStack(gameboy, gameboy->cpu.pc + 1);
 	gameboy->cpu.pc = 0x10;
 }
 
@@ -1904,7 +1916,7 @@ void sbc_a_n(struct gameboy * gameboy, uint8_t n)
 
 void rst_18(struct gameboy * gameboy)
 {
-	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	pushWordOntoStack(gameboy, gameboy->cpu.pc + 1);
 	gameboy->cpu.pc = 0x18;
 }
 
@@ -1938,7 +1950,7 @@ void and_n(struct gameboy * gameboy, uint8_t n)
 
 void rst_20(struct gameboy * gameboy)
 {
-	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	pushWordOntoStack(gameboy, gameboy->cpu.pc + 1);
 	gameboy->cpu.pc = 0x20;
 }
 
@@ -1984,7 +1996,7 @@ void xor_n(struct gameboy * gameboy, uint8_t n)
 
 void rst_28(struct gameboy * gameboy)
 {
-	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	pushWordOntoStack(gameboy, gameboy->cpu.pc + 1);
 	gameboy->cpu.pc = 0x28;
 }
 
@@ -2022,7 +2034,7 @@ void or_n(struct gameboy * gameboy, uint8_t n)
 
 void rst_30(struct gameboy * gameboy)
 {
-	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	pushWordOntoStack(gameboy, gameboy->cpu.pc + 1);
 	gameboy->cpu.pc = 0x30;
 }
 
@@ -2068,16 +2080,12 @@ void ei(struct gameboy * gameboy)
 
 void cp_n(struct gameboy * gameboy, uint8_t n)
 {
-	compareWithRegA(gameboy, gameboy->cpu.l);
+	compareWithRegA(gameboy, n);
 }
 
 void rst_38(struct gameboy * gameboy)
 {
-	static int count;
-	count++;
-	if (count > 10){
-	}
-	pushWordOntoStack(gameboy, gameboy->cpu.pc);
+	pushWordOntoStack(gameboy, gameboy->cpu.pc + 1);
 	gameboy->cpu.pc = 0x38;
 }
 
